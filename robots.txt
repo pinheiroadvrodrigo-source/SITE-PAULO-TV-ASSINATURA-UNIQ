@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://pinheiroadvrodrigo-source.github.io/SITE-PAULO-TV-ASSINATURA-UNIQ/sitemap.xml
