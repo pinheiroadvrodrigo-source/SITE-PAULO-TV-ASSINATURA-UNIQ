@@ -452,9 +452,9 @@ document.getElementById("ano").textContent = new Date().getFullYear();
 const PRODUTOS={tvbox:{nome:"TV Box S1",preco:450,det:"+ frete a combinar",frete:true}};
 PLANOS.forEach((p,i)=>PRODUTOS["plano-"+i]={nome:"Plano "+p.nome,preco:parseFloat(p.preco.replace(".","").replace(",",".")),det:p.per+" · "+p.telas});
 const brl=v=>"R$ "+v.toFixed(2).replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g,".");
-let carrinho={};try{carrinho=JSON.parse(localStorage.getItem("carrinho")||"{}")}catch(e){}
+let carrinho={};try{localStorage.removeItem("carrinho")}catch(e){}
 const cartEl=document.getElementById("cart"),bg=document.getElementById("cartBg");
-function salva(){try{localStorage.setItem("carrinho",JSON.stringify(carrinho))}catch(e){}}
+function salva(){}
 function abre(){cartEl.classList.add("aberto");bg.classList.add("on")}
 function fecha(){cartEl.classList.remove("aberto");bg.classList.remove("on")}
 function render(){
