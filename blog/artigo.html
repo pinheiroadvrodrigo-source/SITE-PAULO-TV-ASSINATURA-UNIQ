@@ -14,7 +14,7 @@
   function erro(t){document.getElementById('aTit').textContent=t;document.getElementById('aCapa').remove();}
   if(!S||!S.ok||!slug) return erro('Artigo não encontrado');
   try{
-    var r=await fetch(S.url+'/rest/v1/artigos?select=*&publicado=eq.true&slug=eq.'+encodeURIComponent(slug),{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
+    var r=await fetch(S.url+'/rest/v1/'+S.t.artigos+'?select=*&publicado=eq.true&slug=eq.'+encodeURIComponent(slug),{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
     var a=(await r.json())[0]; if(!a) return erro('Artigo não encontrado');
     document.title=a.titulo+' | Brasil UniTV';
     var d=document.querySelector('meta[name=description]'); d.content=a.resumo||'';

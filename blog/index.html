@@ -9,7 +9,7 @@
 (async function(){
   var S=window.SUPA; if(!S||!S.ok) return;
   try{
-    var r=await fetch(S.url+'/rest/v1/artigos?select=slug,titulo,resumo,categoria,imagem,tempo_leitura&publicado=eq.true&order=criado_em.desc',{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
+    var r=await fetch(S.url+'/rest/v1/'+S.t.artigos+'?select=slug,titulo,resumo,categoria,imagem,tempo_leitura&publicado=eq.true&order=criado_em.desc',{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
     var L=await r.json(); if(!Array.isArray(L)||!L.length) return;
     var g=document.querySelector('.grid'), esc=function(t){var d=document.createElement('div');d.textContent=t||'';return d.innerHTML};
     g.insertAdjacentHTML('afterbegin',L.map(function(a){return '<a class="card" href="artigo.html?a='+encodeURIComponent(a.slug)+'"><div class="ph">'+(a.imagem?'<img src="'+esc(a.imagem)+'" alt="'+esc(a.titulo)+'" loading="lazy">':'')+'</div><div class="in"><span class="meta">'+esc(a.categoria)+' · '+(a.tempo_leitura||4)+' min</span><h2>'+esc(a.titulo)+'</h2><p>'+esc(a.resumo)+'</p></div></a>'}).join(''));

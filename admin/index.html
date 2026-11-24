@@ -49,7 +49,11 @@ main{max-width:1100px;margin:0 auto;padding:24px 18px 80px}
 .kpi small{color:var(--mut);font-size:12px;font-weight:600}.kpi b{display:block;font-family:Montserrat;font-size:28px;font-weight:900;margin-top:4px}
 .box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
 .box h3{font-size:16px;margin-bottom:12px}
-.cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.hb{margin-bottom:10px}.hb .l{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}.hb .l span{color:var(--mut)}
+.hb .t{height:8px;background:var(--bg2);border-radius:99px;overflow:hidden}.hb .t i{display:block;height:100%;background:linear-gradient(90deg,#ff2a2a,#1f6fff);border-radius:99px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ok);margin-right:5px;animation:pi 1.2s infinite}@keyframes pi{50%{opacity:.25}}
+.eixo{display:flex;justify-content:space-between;color:var(--mut);font-size:11px;margin-top:6px}
 .chart{display:flex;align-items:flex-end;gap:3px;height:160px;padding-top:10px}
 .chart div{flex:1;background:linear-gradient(180deg,#ff2a2a,#1f6fff);border-radius:4px 4px 0 0;min-height:2px;position:relative}
 .chart div:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#000;border:1px solid var(--line);padding:3px 7px;border-radius:6px;font-size:11px;white-space:nowrap}
@@ -99,6 +103,7 @@ td.n,th.n{text-align:right}
     <nav class="tabs">
       <button data-p="painel" class="on">📊 Visitas</button>
       <button data-p="artigos">📝 Artigos</button>
+      <button data-p="prompt">✨ Prompt mestre</button>
       <button data-p="google">🔎 Google</button>
       <button id="bSair">Sair</button>
     </nav>
@@ -114,12 +119,17 @@ td.n,th.n{text-align:right}
         <div class="kpi"><small>Visitas</small><b id="kVis">—</b></div>
         <div class="kpi"><small>Pessoas únicas</small><b id="kPes">—</b></div>
         <div class="kpi"><small>Visitas no blog</small><b id="kBlog">—</b></div>
-        <div class="kpi"><small>Artigos publicados</small><b id="kArt">—</b></div>
+        <div class="kpi"><small><span class="dot"></span>Online agora</small><b id="kAgora">—</b></div>
       </div>
-      <div class="box"><h3>Visitas por dia</h3><div class="chart" id="chart"></div></div>
+      <div class="box"><h3>Visitas por dia</h3><div class="chart" id="chart"></div><div class="eixo" id="eixo"></div></div>
+      <div class="box"><h3>📝 Visitas por artigo do blog</h3><table><thead><tr><th>Artigo</th><th class="n">Visitas</th><th class="n">Pessoas</th></tr></thead><tbody id="tArt"></tbody></table></div>
       <div class="cols">
-        <div class="box"><h3>Páginas mais vistas</h3><table><thead><tr><th>Página</th><th class="n">Visitas</th><th class="n">Pessoas</th></tr></thead><tbody id="tPag"></tbody></table></div>
-        <div class="box"><h3>De onde vieram</h3><table><thead><tr><th>Origem</th><th class="n">Visitas</th></tr></thead><tbody id="tOri"></tbody></table></div>
+        <div class="box"><h3>🌎 Países (Brasil e exterior)</h3><div id="tPais"></div></div>
+        <div class="box"><h3>📱 Aparelhos</h3><div id="tApa"></div></div>
+      </div>
+      <div class="cols">
+        <div class="box"><h3>📄 Páginas mais vistas</h3><table><thead><tr><th>Página</th><th class="n">Visitas</th><th class="n">Pessoas</th></tr></thead><tbody id="tPag"></tbody></table></div>
+        <div class="box"><h3>🔗 De onde vieram</h3><div id="tOri"></div></div>
       </div>
       <p style="color:var(--mut);font-size:12px">Dica: abra o site uma vez neste aparelho depois de entrar aqui. As suas próprias visitas deixam de ser contadas.</p>
     </section>
@@ -168,6 +178,31 @@ td.n,th.n{text-align:right}
       <div class="msg" id="edMsg"></div>
     </section>
 
+    <!-- PROMPT MESTRE -->
+    <section class="pane" id="p-prompt">
+      <div class="head"><div><h2>✨ Prompt mestre de artigos</h2><p>Copie, cole no ChatGPT e receba artigos novos, diferentes dos que já estão no site, prontos para o Google.</p></div></div>
+      <div class="box">
+        <div class="g2" style="grid-template-columns:1fr 1fr 1fr;gap:0 12px">
+          <div><label for="pQtd">Quantos artigos</label><select id="pQtd"><option>1</option><option selected>3</option><option>5</option></select></div>
+          <div><label for="pCidade">Cidade/região (opcional)</label><input id="pCidade" placeholder="Ex.: Campinas"></div>
+          <div><label for="pTema">Tema (opcional)</label><input id="pTema" placeholder="Ex.: futebol, TV Box"></div>
+        </div>
+        <ol class="steps" style="margin-top:16px">
+          <li>Toque em <b>Copiar prompt</b>. Ele já leva a lista de todos os artigos publicados no site.</li>
+          <li>Toque em <b>Abrir ChatGPT</b>, cole e envie.</li>
+          <li>Para cada artigo que vier, toque em <b>+ Novo artigo</b> aqui no painel e cole cada parte no campo certo. Para a capa, use o prompt de imagem que o ChatGPT entregar.</li>
+        </ol>
+        <div class="rowb">
+          <button class="btn btn-pri" id="bCopiar">📋 Copiar prompt</button>
+          <a class="btn btn-out" href="https://chatgpt.com/" target="_blank" rel="noopener">🤖 Abrir ChatGPT ↗</a>
+        </div>
+        <div class="msg" id="pMsg"></div>
+      </div>
+      <div class="box"><h3>Prompt (atualizado com os artigos do site)</h3>
+        <textarea id="pTexto" rows="18" readonly style="font-size:13px;line-height:1.5"></textarea>
+      </div>
+    </section>
+
     <!-- GOOGLE -->
     <section class="pane" id="p-google">
       <div class="head"><div><h2>Google (Search Console)</h2><p>Cliques, pesquisas e posição do site no Google.</p></div>
@@ -197,7 +232,8 @@ if(!window.SUPA||!SUPA.ok){
   msg('lMsg','O painel ainda não está ligado ao Supabase. Cole a <b>Project URL</b> e a chave <b>anon public</b> no arquivo <code>js/stats.js</code> do GitHub.');
   $('bEntrar').disabled=true;
 }
-var sb=(window.SUPA&&SUPA.ok)?supabase.createClient(SUPA.url,SUPA.key):null;
+var sb=(window.SUPA&&SUPA.ok&&window.supabase)?supabase.createClient(SUPA.url,SUPA.key):null;
+if(window.SUPA&&SUPA.ok&&!window.supabase){msg('lMsg','Não foi possível carregar o sistema de login. Verifique a internet e atualize a página.');$('bEntrar').disabled=true}
 try{localStorage.setItem('naoContar','1')}catch(e){}
 
 /* ---------- login ---------- */
@@ -227,34 +263,107 @@ function nomePagina(p){
   var m=p.match(/\?a=(.+)$/);if(m)return 'Blog: '+decodeURIComponent(m[1]).replace(/-/g,' ');
   m=p.match(/\/blog\/(.+)\.html$/);if(m)return 'Blog: '+m[1].replace(/-/g,' ');
   return p}
+var nomesPais=(function(){try{return new Intl.DisplayNames(['pt-BR'],{type:'region'})}catch(e){return null}})();
+function bandeira(c){return /^[A-Z]{2}$/.test(c)?String.fromCodePoint.apply(null,c.split('').map(function(x){return 127397+x.charCodeAt(0)})):'🏳️'}
+function nomeP(c){if(!/^[A-Z]{2}$/.test(c))return 'Não identificado';try{return nomesPais.of(c)}catch(e){return c}}
+function barras(el,L,rot,val){var mx=Math.max.apply(null,L.map(val).concat(1)),tot=L.reduce(function(s,x){return s+val(x)},0)||1;
+  $(el).innerHTML=L.length?L.map(function(x){return '<div class="hb"><div class="l"><b>'+rot(x)+'</b><span>'+fmt(val(x))+' · '+Math.round(val(x)/tot*100)+'%</span></div><div class="t"><i style="width:'+(val(x)/mx*100)+'%"></i></div></div>'}).join(''):'<p class="vazio">Sem dados neste período.</p>'}
 async function carregarPainel(){
-  var a=await Promise.all([sb.rpc('resumo_visitas',{dias:dias}),sb.rpc('visitas_por_dia',{dias:dias}),sb.rpc('origem_visitas',{dias:dias}),
-    sb.from('artigos').select('id',{count:'exact',head:true}).eq('publicado',true)]);
-  if(a[0].error){$('tPag').innerHTML='<tr><td colspan="3" class="vazio">Erro: '+esc(a[0].error.message)+'. Rodou o arquivo supabase.sql?</td></tr>';return}
-  var pag=a[0].data||[],dia=a[1].data||[],ori=a[2].data||[];
-  var tot=pag.reduce(function(s,x){return s+x.visitas},0);
-  var pes=dia.length?Math.max.apply(null,dia.map(function(d){return d.pessoas})):0;
-  $('kVis').textContent=fmt(tot);
-  $('kPes').textContent=fmt(dias===1?pes:dia.reduce(function(s,x){return s+x.pessoas},0));
-  $('kBlog').textContent=fmt(pag.filter(function(x){return x.pagina.indexOf('/blog')===0}).reduce(function(s,x){return s+x.visitas},0));
-  $('kArt').textContent=fmt(5+(a[3].count||0));
-  $('tPag').innerHTML=pag.length?pag.slice(0,30).map(function(x){return '<tr><td>'+esc(nomePagina(x.pagina))+'</td><td class="n">'+fmt(x.visitas)+'</td><td class="n">'+fmt(x.pessoas)+'</td></tr>'}).join(''):'<tr><td colspan="3" class="vazio">Nenhuma visita ainda neste período.</td></tr>';
-  $('tOri').innerHTML=ori.length?ori.map(function(x){return '<tr><td>'+esc(x.origem)+'</td><td class="n">'+fmt(x.visitas)+'</td></tr>'}).join(''):'<tr><td colspan="2" class="vazio">—</td></tr>';
-  var mx=Math.max.apply(null,dia.map(function(d){return d.visitas}).concat(1));
-  $('chart').innerHTML=dia.length?dia.map(function(d){var dt=d.dia.split('-');return '<div style="height:'+Math.max(2,d.visitas/mx*100)+'%" data-t="'+dt[2]+'/'+dt[1]+': '+d.visitas+' visitas"></div>'}).join(''):'<p class="vazio" style="width:100%">Sem dados ainda.</p>';
+  var r=await sb.rpc('unitv_painel',{dias:dias});
+  if(r.error){$('tPag').innerHTML='<tr><td colspan="3" class="vazio">'+(/permiss/.test(r.error.message)?'Este e-mail não tem acesso ao painel.':'Erro: '+esc(r.error.message))+'</td></tr>';return}
+  var d=r.data,pag=d.paginas||[];
+  $('kVis').textContent=fmt(d.visitas);$('kPes').textContent=fmt(d.pessoas);$('kBlog').textContent=fmt(d.blog);$('kAgora').textContent=fmt(d.agora);
+  var arts=pag.filter(function(x){return /^\/blog\/.+/.test(x.pagina)&&!/\/blog\/(index\.html)?$/.test(x.pagina)});
+  $('tArt').innerHTML=arts.length?arts.map(function(x){return '<tr><td>'+esc(x.titulo||nomePagina(x.pagina))+'</td><td class="n">'+fmt(x.visitas)+'</td><td class="n">'+fmt(x.pessoas)+'</td></tr>'}).join(''):'<tr><td colspan="3" class="vazio">Nenhum artigo visitado neste período.</td></tr>';
+  $('tPag').innerHTML=pag.length?pag.slice(0,15).map(function(x){return '<tr><td>'+esc(nomePagina(x.pagina))+'</td><td class="n">'+fmt(x.visitas)+'</td><td class="n">'+fmt(x.pessoas)+'</td></tr>'}).join(''):'<tr><td colspan="3" class="vazio">Nenhuma visita ainda neste período.</td></tr>';
+  barras('tPais',d.paises||[],function(x){return bandeira(x.pais)+' '+esc(nomeP(x.pais))},function(x){return x.visitas});
+  barras('tApa',d.aparelhos||[],function(x){return (x.aparelho==='celular'?'📱 Celular':'💻 Computador')},function(x){return x.visitas});
+  barras('tOri',d.origens||[],function(x){return esc(x.origem)},function(x){return x.visitas});
+  var dia=d.por_dia||[],mx=Math.max.apply(null,dia.map(function(x){return x.visitas}).concat(1));
+  $('chart').innerHTML=dia.length?dia.map(function(x){var dt=x.dia.split('-');return '<div style="height:'+Math.max(2,x.visitas/mx*100)+'%" data-t="'+dt[2]+'/'+dt[1]+': '+x.visitas+' visitas · '+x.pessoas+' pessoas"></div>'}).join(''):'<p class="vazio" style="width:100%">Sem dados ainda.</p>';
+  var f=function(s){var p=s.split('-');return p[2]+'/'+p[1]};$('eixo').innerHTML=dia.length?'<span>'+f(dia[0].dia)+'</span><span>'+f(dia[dia.length-1].dia)+'</span>':'';
+}
+setInterval(function(){if($('app').style.display==='block'&&$('p-painel').classList.contains('on'))carregarPainel()},60000);
+
+
+/* ---------- prompt mestre ---------- */
+async function listaPublicados(){
+  var L=[];
+  try{var r=await fetch('../blog/posts.json?'+Date.now());if(r.ok)(await r.json()).forEach(function(p){L.push({t:p.title,s:p.slug,c:p.category,r:p.summary})})}catch(e){}
+  try{var q=await sb.from(SUPA.t.artigos).select('titulo,slug,categoria,resumo').eq('publicado',true).order('criado_em',{ascending:false});
+    (q.data||[]).forEach(function(a){if(!L.some(function(x){return x.s===a.slug}))L.push({t:a.titulo,s:a.slug,c:a.categoria,r:a.resumo})})}catch(e){}
+  return L;
+}
+async function montaPrompt(){
+  var L=await listaPublicados(),n=$('pQtd').value,cid=$('pCidade').value.trim(),tema=$('pTema').value.trim();
+  var lista=L.length?L.map(function(a,i){return (i+1)+'. '+a.t+' ['+(a.c||'')+'] (endereço: '+a.s+')'+(a.r?' — '+a.r:'')}).join('\n'):'(nenhum ainda)';
+  $('pTexto').value=
+'Você é um redator especialista em SEO para blogs em português do Brasil e trabalha para o blog do site "Brasil UniTV" ('+location.origin+'/blog/).\n\n'+
+'SOBRE O SITE\n'+
+'- Revenda de assinatura de TV por internet: canais ao vivo, filmes, séries, esportes, novelas e infantil.\n'+
+'- Funciona em qualquer aparelho Android: TV Box, TV Stick, Smart TV Android, celular e tablet. Não funciona em iPhone.\n'+
+'- Planos (1 acesso, sem fidelidade): Mensal R$ 30,00 | Trimestral R$ 90,00 | Anual R$ 150,00 | Vitalício R$ 200,00 (pagamento único). TV Box S1: R$ 450,00 + frete.\n'+
+'- Teste grátis pelo WhatsApp. Pagamento por Pix ou cartão.\n'+
+'- Público: famílias e pessoas comuns no Brasil, linguagem simples, sem termos técnicos.'+(cid?'\n- Foco geográfico: '+cid+' e região.':'')+'\n\n'+
+'ARTIGOS JÁ PUBLICADOS (NÃO REPITA estes temas, títulos nem palavras-chave principais)\n'+lista+'\n\n'+
+'TAREFA\n'+
+'Crie '+n+' artigo(s) NOVO(S), com temas diferentes de todos os da lista acima'+(tema?', sobre o tema: '+tema:'')+'.\n'+
+'Antes de escrever, liste em 1 linha cada a palavra-chave principal escolhida e por que ela é diferente das já usadas.\n\n'+
+'REGRAS DE SEO (obrigatórias)\n'+
+'1. Escolha uma palavra-chave principal de cauda longa que as pessoas realmente pesquisam no Google Brasil (ex.: perguntas do tipo "como", "qual", "vale a pena", "melhor").\n'+
+'2. Coloque a palavra-chave no título, no resumo, no primeiro parágrafo e em pelo menos um subtítulo, de forma natural (sem repetir demais).\n'+
+'3. Título com até 60 caracteres, chamativo e claro.\n'+
+'4. Resumo (meta description) com 140 a 160 caracteres, com a palavra-chave e um convite à leitura.\n'+
+'5. Texto de 900 a 1.300 palavras, parágrafos curtos (2 a 4 linhas), com 4 a 6 subtítulos.\n'+
+'6. Inclua uma lista com marcadores ou numerada e, se fizer sentido, uma tabela simples.\n'+
+'7. Inclua uma seção final "Perguntas frequentes" com 3 perguntas e respostas curtas.\n'+
+'8. Use palavras relacionadas (sinônimos e termos do mesmo assunto) ao longo do texto.\n'+
+'9. Termine com uma chamada para o teste grátis no WhatsApp.\n'+
+'10. Não invente nomes de canais, marcas de TV nem promessas que o site não oferece; não cite emissoras ou plataformas de streaming pelo nome; não use dados ou estatísticas inventados.\n'+
+'11. Escreva em português do Brasil, tom amigável e confiável.\n\n'+
+'FORMATO DA RESPOSTA (para cada artigo, exatamente nesta ordem)\n'+
+'TÍTULO: ...\n'+
+'ENDEREÇO: palavras-minusculas-separadas-por-hifen (curto, com a palavra-chave, sem acentos)\n'+
+'CATEGORIA: uma destas: Dicas, Guias, Comparativos, Planos, Novidades, Esportes\n'+
+'TEMPO DE LEITURA: número de minutos\n'+
+'RESUMO: ...\n'+
+'PROMPT DA IMAGEM DE CAPA: descrição em português para gerar uma foto realista 16:9, iluminação azul e vermelha, sem texto e sem logos de marcas\n'+
+'TEXTO:\n'+
+'(o artigo completo, pronto para colar. Use "## " no início das linhas de subtítulo e "- " para itens de lista. Não repita o título no texto.)\n\n'+
+'Separe cada artigo com uma linha "==========".';
+}
+$('pQtd').onchange=montaPrompt;$('pCidade').oninput=montaPrompt;$('pTema').oninput=montaPrompt;
+document.querySelector('[data-p="prompt"]').addEventListener('click',montaPrompt);
+$('bCopiar').onclick=async function(){
+  await montaPrompt();var t=$('pTexto');
+  try{await navigator.clipboard.writeText(t.value)}catch(e){t.focus();t.select();try{document.execCommand('copy')}catch(e2){}}
+  msg('pMsg','✅ Prompt copiado! Agora toque em <b>Abrir ChatGPT</b>, cole e envie.','ok');
+};
+/* colar texto com "## " e "- " vira subtítulo e lista no editor */
+function mdParaHtml(t){
+  var out=[],lista=null;
+  t.split(/\n/).forEach(function(l){l=l.trim();
+    if(/^[-*•]\s+/.test(l)){if(!lista){lista=[];}lista.push('<li>'+esc(l.replace(/^[-*•]\s+/,''))+'</li>');return}
+    if(lista){out.push('<ul>'+lista.join('')+'</ul>');lista=null}
+    if(!l)return;
+    if(/^#{2,3}\s+/.test(l))out.push('<h2>'+esc(l.replace(/^#+\s+/,''))+'</h2>');
+    else out.push('<p>'+esc(l)+'</p>');
+  });
+  if(lista)out.push('<ul>'+lista.join('')+'</ul>');
+  return out.join('').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
 }
 
 /* ---------- artigos ---------- */
 var atual=null,imgUrl='';
 async function carregarArtigos(){
-  var r=await sb.from('artigos').select('id,slug,titulo,categoria,imagem,publicado,criado_em').order('criado_em',{ascending:false});
+  var r=await sb.from(SUPA.t.artigos).select('id,slug,titulo,categoria,imagem,publicado,criado_em').order('criado_em',{ascending:false});
   var L=r.data||[];
   $('lista').innerHTML=L.length?L.map(function(a){return '<div class="it"><div class="th" style="background-image:url(\''+esc(a.imagem||'')+'\')"></div><div><b>'+esc(a.titulo)+'<span class="pill '+(a.publicado?'pub':'ras')+'">'+(a.publicado?'publicado':'rascunho')+'</span></b><small>'+esc(a.categoria)+' · '+new Date(a.criado_em).toLocaleDateString('pt-BR')+'</small></div><div class="acts"><a class="btn btn-out btn-sm" target="_blank" href="/blog/artigo.html?a='+encodeURIComponent(a.slug)+'">Ver</a><button class="btn btn-out btn-sm" data-ed="'+a.id+'">Editar</button><button class="btn btn-out btn-sm" data-del="'+a.id+'">Excluir</button></div></div>'}).join(''):'<p class="vazio">Nenhum artigo novo ainda. Clique em “+ Novo artigo”.</p>';
 }
 $('lista').onclick=async function(e){
   var ed=e.target.closest('[data-ed]'),del=e.target.closest('[data-del]');
-  if(ed){var r=await sb.from('artigos').select('*').eq('id',ed.dataset.ed).single();abrirEditor(r.data)}
-  if(del&&confirm('Excluir este artigo? Ele sai do site na hora.')){var r2=await sb.from('artigos').delete().eq('id',del.dataset.del);if(r2.error)toast('Erro: '+r2.error.message);else{toast('Artigo excluído');carregarArtigos();carregarPainel()}}
+  if(ed){var r=await sb.from(SUPA.t.artigos).select('*').eq('id',ed.dataset.ed).single();abrirEditor(r.data)}
+  if(del&&confirm('Excluir este artigo? Ele sai do site na hora.')){var r2=await sb.from(SUPA.t.artigos).delete().eq('id',del.dataset.del);if(r2.error)toast('Erro: '+r2.error.message);else{toast('Artigo excluído');carregarArtigos()}}
 };
 function slugify(t){return t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)}
 var slugManual=false;
@@ -277,9 +386,9 @@ $('fImg').onchange=async function(){
   var f=this.files[0];if(!f)return;if(f.size>5e6)return toast('Imagem muito grande (máx. 5 MB)');
   $('capa').textContent='Enviando…';
   var nome=Date.now()+'-'+slugify(f.name.replace(/\.[^.]+$/,''))+'.'+(f.name.split('.').pop()||'jpg').toLowerCase();
-  var r=await sb.storage.from('blog').upload(nome,f,{cacheControl:'31536000',upsert:false});
+  var r=await sb.storage.from(SUPA.t.bucket).upload(nome,f,{cacheControl:'31536000',upsert:false});
   if(r.error){toast('Erro ao enviar: '+r.error.message);mostraCapa();return}
-  imgUrl=sb.storage.from('blog').getPublicUrl(nome).data.publicUrl;mostraCapa();toast('Imagem enviada');this.value='';
+  imgUrl=sb.storage.from(SUPA.t.bucket).getPublicUrl(nome).data.publicUrl;mostraCapa();toast('Imagem enviada');this.value='';
 };
 document.querySelectorAll('.bar button').forEach(function(b){b.onmousedown=function(e){e.preventDefault()};b.onclick=function(){
   var c=b.dataset.c;$('ed').focus();
@@ -290,7 +399,7 @@ document.querySelectorAll('.bar button').forEach(function(b){b.onmousedown=funct
   else document.execCommand(c,false,null);
 }});
 $('ed').addEventListener('paste',function(e){e.preventDefault();var t=(e.clipboardData||window.clipboardData).getData('text/plain');
-  document.execCommand('insertHTML',false,t.split(/\n{2,}/).map(function(p){return '<p>'+esc(p).replace(/\n/g,'<br>')+'</p>'}).join(''))});
+  document.execCommand('insertHTML',false,mdParaHtml(t))});
 $('bSalvar').onclick=async function(){
   var d={titulo:$('fTitulo').value.trim(),slug:slugify($('fSlug').value||$('fTitulo').value),categoria:$('fCat').value,
     tempo_leitura:+$('fTempo').value||4,resumo:$('fResumo').value.trim(),imagem:imgUrl||null,conteudo:$('ed').innerHTML,
@@ -299,7 +408,7 @@ $('bSalvar').onclick=async function(){
   if(!d.slug)return msg('edMsg','Coloque o endereço do artigo.');
   if($('ed').innerText.trim().length<50)return msg('edMsg','O texto está muito curto.');
   this.disabled=true;
-  var r=atual?await sb.from('artigos').update(d).eq('id',atual.id).select().single():await sb.from('artigos').insert(d).select().single();
+  var r=atual?await sb.from(SUPA.t.artigos).update(d).eq('id',atual.id).select().single():await sb.from(SUPA.t.artigos).insert(d).select().single();
   this.disabled=false;
   if(r.error)return msg('edMsg',r.error.code==='23505'?'Já existe um artigo com esse endereço. Mude o endereço.':'Erro: '+esc(r.error.message));
   atual=r.data;var link=location.origin+'/blog/artigo.html?a='+encodeURIComponent(r.data.slug);

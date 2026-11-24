@@ -538,7 +538,7 @@ document.getElementById("botForm").onsubmit=e=>{e.preventDefault();const i=docum
 document.addEventListener('DOMContentLoaded',async function(){
   var S=window.SUPA; if(!S||!S.ok) return;
   try{
-    var r=await fetch(S.url+'/rest/v1/artigos?select=slug,titulo,resumo,categoria,imagem,tempo_leitura&publicado=eq.true&order=criado_em.desc&limit=3',{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
+    var r=await fetch(S.url+'/rest/v1/'+S.t.artigos+'?select=slug,titulo,resumo,categoria,imagem,tempo_leitura&publicado=eq.true&order=criado_em.desc&limit=3',{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
     var L=await r.json(); if(!Array.isArray(L)||!L.length) return;
     var g=document.querySelector('.blog-grid'); if(!g) return;
     var esc=function(t){var d=document.createElement('div');d.textContent=t||'';return d.innerHTML};
