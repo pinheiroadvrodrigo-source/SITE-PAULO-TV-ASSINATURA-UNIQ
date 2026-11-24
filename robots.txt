@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
-Sitemap: https://pinheiroadvrodrigo-source.github.io/SITE-PAULO-TV-ASSINATURA-UNIQ/sitemap.xml
+Disallow: /admin/
+Sitemap: https://unitvbrasiloficial-br.com.br/sitemap.xml
