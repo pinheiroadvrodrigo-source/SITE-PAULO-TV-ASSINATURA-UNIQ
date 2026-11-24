@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Brasil UniTV</title><meta name="description" content=""><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="blog.css"><script src="/js/stats.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script></head><body>
+<header><div class="wrap nav"><a href="../index.html" class="logo"><span class="star">▶</span>Brasil <span class="grad">UniTV</span></a>
+<nav class="menu"><a href="../index.html">Início</a><a href="index.html">Blog</a><a href="../index.html#planos">Planos</a><a href="../index.html#tvbox">TV Box</a></nav></div></header><article id="art"><a href="index.html" class="voltar">← Voltar para o blog</a><br><br>
+<span class="meta" id="aMeta"></span><h1 id="aTit">Carregando…</h1>
+<div class="ph capa" id="aCapa"></div>
+<div class="txt" id="aTxt"></div>
+<div class="cta"><h3>Teste grátis hoje mesmo</h3><p>Veja a qualidade na sua TV antes de assinar. Planos a partir de R$ 30,00, sem fidelidade.</p>
+<a class="btn btn-whats" href="https://wa.me/5519996386341?text=Ol%C3%A1%21%20Gostaria%20de%20fazer%20um%20teste%20do%20UniTV" target="_blank" rel="noopener">💬 Quero meu teste grátis</a></div></article>
+<script>
+(async function(){
+  var S=window.SUPA, slug=new URLSearchParams(location.search).get('a');
+  function erro(t){document.getElementById('aTit').textContent=t;document.getElementById('aCapa').remove();}
+  if(!S||!S.ok||!slug) return erro('Artigo não encontrado');
+  try{
+    var r=await fetch(S.url+'/rest/v1/artigos?select=*&publicado=eq.true&slug=eq.'+encodeURIComponent(slug),{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
+    var a=(await r.json())[0]; if(!a) return erro('Artigo não encontrado');
+    document.title=a.titulo+' | Brasil UniTV';
+    var d=document.querySelector('meta[name=description]'); d.content=a.resumo||'';
+    document.getElementById('aTit').textContent=a.titulo;
+    document.getElementById('aMeta').textContent=(a.categoria||'Dicas')+' · '+(a.tempo_leitura||4)+' min de leitura';
+    if(a.imagem){var i=new Image();i.src=a.imagem;i.alt=a.titulo;document.getElementById('aCapa').appendChild(i);} else document.getElementById('aCapa').remove();
+    document.getElementById('aTxt').innerHTML=DOMPurify.sanitize(a.conteudo);
+    var ld=document.createElement('script');ld.type='application/ld+json';ld.textContent=JSON.stringify({"@context":"https://schema.org","@type":"Article","headline":a.titulo,"description":a.resumo||"","datePublished":a.criado_em,"dateModified":a.atualizado_em,"image":a.imagem||undefined,"author":{"@type":"Organization","name":"Brasil UniTV"}});document.head.appendChild(ld);
+  }catch(e){erro('Não foi possível carregar o artigo agora.');}
+})();
+</script>
+<footer><div class="wrap">© Brasil UniTV · <a href="../index.html">Voltar ao site</a><br><span style="font-size:11px;opacity:.7">Revendedor independente. UniTV é marca de seu respectivo titular; este site não é o site oficial da marca.</span></div></footer>
+<a class="whats-float" href="https://wa.me/5519996386341?text=Ol%C3%A1%21%20Vim%20pelo%20blog%20da%20Brasil%20UniTV%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener" aria-label="WhatsApp"><svg viewBox="0 0 32 32"><path d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 7L3 29l6.4-2c2 1.1 4.3 1.7 6.6 1.7 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2.1 0-4.1-.6-5.9-1.7l-.4-.3-3.8 1.2 1.2-3.7-.3-.4c-1.2-1.8-1.8-3.8-1.8-5.9C5 9.8 9.9 5 16 5s11 4.8 11 10.7-4.9 10.7-11 10.7zm6-8c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2-.2.3-.9 1.1-1.1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.7 5.9 5.1 2.9 1.1 3.5.9 4.1.9.6-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.4-.3-.7-.4z"/></svg></a></body></html>

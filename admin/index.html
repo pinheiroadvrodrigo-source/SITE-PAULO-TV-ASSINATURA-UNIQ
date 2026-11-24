@@ -4,772 +4,309 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>Admin — Brasil UniTV</title>
+<title>Painel — Brasil UniTV</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="/js/stats.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#050505;--card:#141418;--card2:#1b1b21;--line:#2b2b34;--red:#e50914;--red2:#ff4d4d;--blue:#1f6fff;--txt:#f2f2f5;--mut:#a9a9b6;--ok:#22c55e;--warn:#f5b301}
+:root{--bg:#050505;--bg2:#0b0b0e;--card:#141418;--line:#2b2b34;--red:#e50914;--blue:#1f6fff;--txt:#f2f2f5;--mut:#a9a9b6;--ok:#22c55e}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;min-height:100vh}
-h1,h2,h3,.logo,.btn,.tab{font-family:Montserrat,sans-serif}
-a{color:#7fb0ff}
-.grad{background:linear-gradient(90deg,var(--red2),var(--red),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
-.logo{font-weight:900;font-size:19px;display:flex;align-items:center;gap:8px;color:var(--txt);text-decoration:none}
-.star{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--red),var(--blue));font-size:15px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 20px;border-radius:999px;font-weight:800;font-size:14px;cursor:pointer;border:0;transition:.2s;text-decoration:none;color:#fff}
-.btn-pri{background:linear-gradient(90deg,#ff2a2a,#c4000f)}
-.btn-pri:hover{filter:brightness(1.1)}
-.btn-out{background:transparent;border:1.5px solid var(--line);color:var(--txt)}
-.btn-out:hover{border-color:var(--red)}
-.btn-sm{padding:7px 13px;font-size:12px}
-.btn-del{background:transparent;border:1.5px solid #5a1a1f;color:#ff8a8a}
+h1,h2,h3,.logo,.btn{font-family:Montserrat,sans-serif}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 18px;border-radius:999px;font-weight:800;font-size:14px;border:0;cursor:pointer;color:#fff;text-decoration:none}
+.btn-pri{background:linear-gradient(90deg,#ff2a2a,#c4000f)}.btn-out{background:transparent;border:1px solid var(--line)}.btn-sm{padding:7px 12px;font-size:12px}
 .btn:disabled{opacity:.5;cursor:wait}
-input,select,textarea{width:100%;background:#0d0d10;border:1px solid var(--line);color:var(--txt);border-radius:12px;padding:12px 14px;font:inherit;font-size:15px}
-input:focus,select:focus,textarea:focus,.editor:focus{outline:2px solid var(--red);border-color:transparent}
-label{display:block;font-size:13px;font-weight:600;color:var(--mut);margin:16px 0 6px}
-.hint{font-size:12px;color:var(--mut);margin-top:5px}
+input,select,textarea{width:100%;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;color:#fff;font:inherit;font-size:15px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--red)}
+label{display:block;font-size:13px;color:var(--mut);margin:14px 0 6px;font-weight:600}
+.logo{font-weight:900;font-size:18px;display:flex;align-items:center;gap:8px}
+.star{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--red),var(--blue));font-size:13px}
+.grad{background:linear-gradient(90deg,#ff4d4d,#e50914,#1f6fff);-webkit-background-clip:text;background-clip:text;color:transparent}
 /* login */
-#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 80% 20%,rgba(229,9,20,.2),transparent 50%),radial-gradient(circle at 10% 90%,rgba(31,111,255,.18),transparent 50%)}
-.login-box{width:100%;max-width:380px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:32px}
-.login-box h1{font-size:22px;margin:18px 0 4px}
-.login-box p{color:var(--mut);font-size:14px}
-.login-box .btn{width:100%;margin-top:22px;padding:14px}
-.erro{color:#ff8a8a;font-size:13px;margin-top:12px;min-height:18px}
+#login{display:grid;place-items:center;min-height:100vh;padding:20px}
+.lbox{width:100%;max-width:380px;background:var(--bg2);border:1px solid var(--line);border-radius:22px;padding:30px}
+.lbox h1{font-size:22px;margin:18px 0 4px}.lbox p{color:var(--mut);font-size:14px}
+.lbox .btn{width:100%;margin-top:20px}
+.msg{margin-top:14px;font-size:14px;border-radius:10px;padding:10px 12px;display:none}
+.msg.err{display:block;background:rgba(229,9,20,.12);border:1px solid rgba(229,9,20,.5);color:#ffb3b3}
+.msg.ok{display:block;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.5);color:#bbf7d0}
 /* app */
 #app{display:none}
-header{position:sticky;top:0;z-index:20;background:rgba(5,5,5,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.top{max-width:1180px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;justify-content:space-between}
-.top .who{font-size:13px;color:var(--mut);display:flex;gap:12px;align-items:center}
-.tabs{max-width:1180px;margin:0 auto;padding:0 18px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
-.tab{background:none;border:0;color:var(--mut);font-weight:700;font-size:14px;padding:12px 14px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
-.tab.on{color:#fff;border-color:var(--red)}
-main{max-width:1180px;margin:0 auto;padding:26px 18px 80px}
+.top{position:sticky;top:0;z-index:10;background:rgba(5,5,5,.9);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .in{max-width:1100px;margin:0 auto;padding:12px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.tabs button{background:none;border:1px solid transparent;color:var(--mut);padding:8px 14px;border-radius:999px;font-weight:700;cursor:pointer;font-size:14px}
+.tabs button.on{background:var(--card);border-color:var(--line);color:#fff}
+main{max-width:1100px;margin:0 auto;padding:24px 18px 80px}
 .pane{display:none}.pane.on{display:block}
-.head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:20px}
-.head h2{font-size:24px;font-weight:900}
-.head p{color:var(--mut);font-size:14px}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
-.kpi small{color:var(--mut);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
-.kpi b{display:block;font-family:Montserrat;font-size:28px;font-weight:900;margin-top:4px}
-@media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}}
-.box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px}
-.box h3{font-size:17px;margin-bottom:12px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{text-align:left;color:var(--mut);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.6px;padding:10px 8px;border-bottom:1px solid var(--line)}
-td{padding:12px 8px;border-bottom:1px solid #1f1f26;vertical-align:middle}
-td.n,th.n{text-align:right;white-space:nowrap}
-.tw{overflow-x:auto}
-.bar{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--red),var(--blue));margin-top:6px;min-width:2px}
-.art{display:flex;gap:12px;align-items:center}
-.art img{width:64px;height:40px;object-fit:cover;border-radius:8px;background:#222;flex-shrink:0}
-.art .t{font-weight:600}
-.art .s{font-size:12px;color:var(--mut)}
-.acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.aviso{background:rgba(245,179,1,.08);border:1px solid rgba(245,179,1,.35);color:#ffd970;border-radius:14px;padding:14px 16px;font-size:14px;margin-bottom:18px}
-.aviso.ok{background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.35);color:#86efac}
-.vazio{color:var(--mut);text-align:center;padding:30px 10px;font-size:14px}
-/* editor */
-.grid2{display:grid;grid-template-columns:2fr 1fr;gap:18px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}}
-.toolbar{display:flex;flex-wrap:wrap;gap:4px;background:var(--card2);border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;padding:8px}
-.toolbar button{background:#26262e;border:0;color:var(--txt);border-radius:8px;padding:7px 11px;font-size:13px;font-weight:700;cursor:pointer}
-.toolbar button:hover{background:var(--red)}
-.editor{min-height:380px;background:#0d0d10;border:1px solid var(--line);border-radius:0 0 12px 12px;padding:18px;font-size:16px;color:#d6d6de;line-height:1.7}
-.editor h2{font-size:22px;color:#fff;margin:20px 0 8px;font-family:Montserrat}
-.editor h3{font-size:18px;color:#fff;margin:16px 0 6px;font-family:Montserrat}
-.editor p{margin-bottom:12px}
-.editor ul,.editor ol{margin:0 0 12px 22px}
-.editor a{color:#ff8a8a}
-.editor:empty:before{content:attr(data-ph);color:#555}
-#htmlBox{display:none;min-height:380px;font-family:ui-monospace,monospace;font-size:13px;border-radius:0 0 12px 12px}
-.capa-prev{aspect-ratio:16/9;border-radius:14px;border:1px dashed var(--line);background:#0d0d10 center/cover no-repeat;display:grid;place-items:center;color:var(--mut);font-size:13px;margin-top:6px;cursor:pointer}
-.cnt{float:right;font-weight:500}
-.cnt.bad{color:#ff8a8a}
-.sticky{position:sticky;top:120px}
-.pub{display:flex;flex-direction:column;gap:10px;margin-top:20px}
-.pub .btn{width:100%;padding:14px}
-#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(120px);background:#111;border:1px solid var(--line);padding:14px 20px;border-radius:14px;font-size:14px;z-index:100;transition:.3s;max-width:92vw}
-#toast.show{transform:translateX(-50%) translateY(0)}
-#toast.ok{border-color:var(--ok)}#toast.err{border-color:var(--red)}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;z-index:60;padding:20px}
-.modal.on{display:flex;flex-direction:column}
-.modal iframe{flex:1;border:0;border-radius:14px;background:#050505;margin-top:10px}
-.pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:#26262e;color:var(--mut)}
-.pill.ok{background:rgba(34,197,94,.15);color:#86efac}
-.pill.no{background:rgba(229,9,20,.15);color:#ff8a8a}
-.steps{counter-reset:s;list-style:none;display:grid;gap:10px;font-size:14px;color:#d6d6de}
-.steps li{counter-increment:s;padding-left:34px;position:relative}
-.steps li:before{content:counter(s);position:absolute;left:0;top:0;width:24px;height:24px;border-radius:50%;background:var(--red);display:grid;place-items:center;font-weight:800;font-size:12px;color:#fff}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.seg{display:inline-flex;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:3px}
-.seg button{background:none;border:0;color:var(--mut);padding:7px 14px;border-radius:99px;font-weight:700;font-size:13px;cursor:pointer}
+.head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.head h2{font-size:24px}.head p{color:var(--mut);font-size:14px}
+.seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+.seg button{background:none;border:0;color:var(--mut);padding:6px 12px;border-radius:999px;font-weight:700;cursor:pointer;font-size:13px}
 .seg button.on{background:var(--red);color:#fff}
-@media(max-width:600px){.art img{display:none}.hide-m{display:none}td,th{padding:10px 6px}}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+.kpi small{color:var(--mut);font-size:12px;font-weight:600}.kpi b{display:block;font-family:Montserrat;font-size:28px;font-weight:900;margin-top:4px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+.box h3{font-size:16px;margin-bottom:12px}
+.cols{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.chart{display:flex;align-items:flex-end;gap:3px;height:160px;padding-top:10px}
+.chart div{flex:1;background:linear-gradient(180deg,#ff2a2a,#1f6fff);border-radius:4px 4px 0 0;min-height:2px;position:relative}
+.chart div:hover::after{content:attr(data-t);position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#000;border:1px solid var(--line);padding:3px 7px;border-radius:6px;font-size:11px;white-space:nowrap}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 6px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:12px;font-weight:600}
+td.n,th.n{text-align:right}
+.vazio{color:var(--mut);text-align:center;padding:20px}
+.list{display:grid;gap:10px}
+.it{display:grid;grid-template-columns:70px 1fr auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px}
+.it .th{width:70px;height:46px;border-radius:8px;background:linear-gradient(135deg,#1c0a0e,#0a1636) center/cover}
+.it b{display:block;font-size:15px}.it small{color:var(--mut);font-size:12px}
+.it .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px}
+.pill.pub{background:rgba(34,197,94,.15);color:#86efac}.pill.ras{background:rgba(169,169,182,.15);color:var(--mut)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.bar{display:flex;gap:4px;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-bottom:0;border-radius:12px 12px 0 0;padding:6px}
+.bar button{background:var(--card);border:1px solid var(--line);color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:700}
+#ed{min-height:340px;background:var(--card);border:1px solid var(--line);border-radius:0 0 12px 12px;padding:16px;outline:none;font-size:16px;line-height:1.7}
+#ed h2{font-size:22px;margin:18px 0 8px}#ed p{margin-bottom:12px}#ed ul,#ed ol{margin:0 0 12px 22px}#ed a{color:#ff6b6b}
+.capa{aspect-ratio:16/9;max-width:360px;border-radius:12px;border:1px dashed var(--line);background:var(--bg2) center/cover;display:grid;place-items:center;color:var(--mut);font-size:13px;cursor:pointer;margin-top:4px}
+.chk{display:flex;align-items:center;gap:8px;margin-top:16px;font-weight:600}.chk input{width:auto}
+.rowb{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111;border:1px solid var(--line);padding:12px 18px;border-radius:999px;font-weight:600;z-index:50;display:none}
+.toast.on{display:block}
+.steps{margin:6px 0 0 20px;display:grid;gap:8px;color:#d6d6de}.steps a{color:#ff6b6b}
+@media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr)}.cols,.g2{grid-template-columns:1fr}.it{grid-template-columns:56px 1fr}.it .acts{grid-column:1/-1;justify-content:flex-start}.it .th{width:56px;height:40px}.tabs{margin-left:0;width:100%}}
 </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<section id="login">
-  <form class="login-box" id="fLogin" autocomplete="on">
-    <a class="logo" href="/"><span class="star">▶</span>Brasil <span class="grad">UniTV</span></a>
-    <h1>Área do administrador</h1>
-    <p>Entre para ver as visitas e publicar artigos.</p>
-    <label for="lUser">Login</label>
-    <input id="lUser" name="username" autocomplete="username" required>
-    <label for="lPass">Senha</label>
-    <input id="lPass" name="password" type="password" autocomplete="current-password" required>
-    <button class="btn btn-pri" type="submit">Entrar</button>
-    <div class="erro" id="lErr"></div>
+<section id="login"><div class="lbox">
+  <div class="logo"><span class="star">▶</span>Brasil <span class="grad">UniTV</span></div>
+  <h1>Painel do site</h1><p>Entre com o e-mail e a senha cadastrados no Supabase.</p>
+  <form id="fLogin">
+    <label for="lEmail">E-mail</label><input id="lEmail" type="email" autocomplete="username" required>
+    <label for="lSenha">Senha</label><input id="lSenha" type="password" autocomplete="current-password" required>
+    <button class="btn btn-pri" id="bEntrar">Entrar</button>
   </form>
-</section>
+  <div class="msg" id="lMsg"></div>
+</div></section>
 
 <!-- APP -->
 <div id="app">
-<header>
-  <div class="top">
-    <a class="logo" href="/" target="_blank"><span class="star">▶</span>Brasil <span class="grad">UniTV</span></a>
-    <div class="who"><span>Olá, Paulo</span><button class="btn btn-out btn-sm" id="bSair">Sair</button></div>
-  </div>
-  <nav class="tabs">
-    <button class="tab on" data-p="visitas">📊 Visitas</button>
-    <button class="tab" data-p="google">🔎 Google</button>
-    <button class="tab" data-p="artigos">📰 Artigos</button>
-    <button class="tab" data-p="novo">✍️ Novo artigo</button>
-    <button class="tab" data-p="config">⚙️ Configurações</button>
-  </nav>
-</header>
-
-<main>
-<!-- VISITAS -->
-<section class="pane on" id="p-visitas">
-  <div class="head">
-    <div><h2>Visitas por artigo</h2><p>Quantas vezes cada página foi aberta desde que o contador foi ligado.</p></div>
-    <div class="row"><button class="btn btn-out btn-sm" id="bRefreshV">↻ Atualizar</button><a class="btn btn-out btn-sm" id="lGcFull" target="_blank" rel="noopener">Relatório completo ↗</a></div>
-  </div>
-  <div id="vAviso"></div>
-  <div class="kpis">
-    <div class="kpi"><small>Visitas no site</small><b id="kTotal">—</b></div>
-    <div class="kpi"><small>Página inicial</small><b id="kHome">—</b></div>
-    <div class="kpi"><small>Visitas no blog</small><b id="kBlog">—</b></div>
-    <div class="kpi"><small>Artigos</small><b id="kArts">—</b></div>
-  </div>
-  <div class="box"><h3>Ranking dos artigos</h3><div class="tw"><table>
-    <thead><tr><th>Artigo</th><th class="n">Visitas</th><th class="n hide-m">Pessoas únicas</th></tr></thead>
-    <tbody id="tVisitas"><tr><td colspan="3" class="vazio">Carregando…</td></tr></tbody>
-  </table></div></div>
-</section>
-
-<!-- GOOGLE -->
-<section class="pane" id="p-google">
-  <div class="head">
-    <div><h2>Desempenho no Google</h2><p>Dados do Google Search Console: cliques, aparições na pesquisa e posição de cada artigo.</p></div>
-    <div class="row">
-      <div class="seg" id="segDias"><button data-d="7">7 dias</button><button data-d="28" class="on">28 dias</button><button data-d="90">3 meses</button></div>
-      <button class="btn btn-pri btn-sm" id="bGConn">Conectar com Google</button>
-      <a class="btn btn-out btn-sm" id="lGscOpen" target="_blank" rel="noopener">Abrir Search Console ↗</a>
-    </div>
-  </div>
-  <div id="gAviso"></div>
-  <div class="kpis">
-    <div class="kpi"><small>Cliques</small><b id="gClk">—</b></div>
-    <div class="kpi"><small>Impressões</small><b id="gImp">—</b></div>
-    <div class="kpi"><small>CTR médio</small><b id="gCtr">—</b></div>
-    <div class="kpi"><small>Posição média</small><b id="gPos">—</b></div>
-  </div>
-  <div class="box"><h3>Por página</h3><div class="tw"><table>
-    <thead><tr><th>Página</th><th class="n">Cliques</th><th class="n">Impressões</th><th class="n hide-m">CTR</th><th class="n">Posição</th><th></th></tr></thead>
-    <tbody id="tGPages"><tr><td colspan="6" class="vazio">Toque em “Conectar com Google” para carregar.</td></tr></tbody>
-  </table></div></div>
-  <div class="box"><h3>O que as pessoas pesquisaram</h3><div class="tw"><table>
-    <thead><tr><th>Pesquisa no Google</th><th class="n">Cliques</th><th class="n">Impressões</th><th class="n">Posição</th></tr></thead>
-    <tbody id="tGQueries"><tr><td colspan="4" class="vazio">—</td></tr></tbody>
-  </table></div></div>
-</section>
-
-<!-- ARTIGOS -->
-<section class="pane" id="p-artigos">
-  <div class="head">
-    <div><h2>Artigos publicados</h2><p>Edite, veja no site ou exclua.</p></div>
-    <button class="btn btn-pri btn-sm" data-go="novo">+ Novo artigo</button>
-  </div>
-  <div class="box"><div class="tw"><table>
-    <thead><tr><th>Artigo</th><th>Data</th><th></th></tr></thead>
-    <tbody id="tArts"><tr><td colspan="3" class="vazio">Carregando…</td></tr></tbody>
-  </table></div></div>
-</section>
-
-<!-- NOVO / EDITAR -->
-<section class="pane" id="p-novo">
-  <div class="head"><div><h2 id="edTitle">Novo artigo</h2><p>Escreva, coloque uma imagem de capa e publique. O artigo entra no blog e no mapa do site automaticamente.</p></div></div>
-  <div id="edAviso"></div>
-  <div class="grid2">
-    <div>
-      <label for="fTitulo">Título do artigo</label>
-      <input id="fTitulo" maxlength="110" placeholder="Ex.: Como instalar o app na Smart TV Samsung">
-      <label for="fSlug">Endereço (URL)</label>
-      <input id="fSlug" placeholder="como-instalar-o-app-na-smart-tv-samsung">
-      <div class="hint" id="slugHint"></div>
-      <label>Conteúdo</label>
-      <div class="toolbar" id="tb">
-        <button type="button" data-c="formatBlock" data-v="h2" title="Subtítulo">Subtítulo</button>
-        <button type="button" data-c="formatBlock" data-v="h3" title="Subtítulo menor">Sub menor</button>
-        <button type="button" data-c="formatBlock" data-v="p" title="Parágrafo">Texto</button>
-        <button type="button" data-c="bold" title="Negrito"><b>N</b></button>
-        <button type="button" data-c="italic" title="Itálico"><i>I</i></button>
-        <button type="button" data-c="insertUnorderedList" title="Lista">• Lista</button>
-        <button type="button" data-c="insertOrderedList" title="Lista numerada">1. Lista</button>
-        <button type="button" data-c="link" title="Link">🔗 Link</button>
-        <button type="button" data-c="removeFormat" title="Limpar formatação">Limpar</button>
-        <button type="button" data-c="html" title="Ver HTML">&lt;/&gt;</button>
+  <div class="top"><div class="in">
+    <div class="logo"><span class="star">▶</span>Brasil <span class="grad">UniTV</span></div>
+    <nav class="tabs">
+      <button data-p="painel" class="on">📊 Visitas</button>
+      <button data-p="artigos">📝 Artigos</button>
+      <button data-p="google">🔎 Google</button>
+      <button id="bSair">Sair</button>
+    </nav>
+  </div></div>
+  <main>
+    <!-- VISITAS -->
+    <section class="pane on" id="p-painel">
+      <div class="head">
+        <div><h2>Visitas do site</h2><p>Quantas pessoas entraram, em quais páginas e de onde vieram.</p></div>
+        <div class="seg" id="segDias"><button data-d="1">Hoje</button><button data-d="7">7 dias</button><button data-d="30" class="on">30 dias</button><button data-d="90">90 dias</button></div>
       </div>
-      <div class="editor" id="editor" contenteditable="true" data-ph="Comece a escrever aqui… Use “Subtítulo” para dividir o texto em partes (ajuda no Google)."></div>
-      <textarea id="htmlBox" spellcheck="false"></textarea>
-      <div class="hint" id="wordInfo">0 palavras</div>
-    </div>
-    <div><div class="sticky">
-      <label>Imagem de capa</label>
-      <div class="capa-prev" id="capaPrev">Toque para escolher a imagem</div>
+      <div class="kpis">
+        <div class="kpi"><small>Visitas</small><b id="kVis">—</b></div>
+        <div class="kpi"><small>Pessoas únicas</small><b id="kPes">—</b></div>
+        <div class="kpi"><small>Visitas no blog</small><b id="kBlog">—</b></div>
+        <div class="kpi"><small>Artigos publicados</small><b id="kArt">—</b></div>
+      </div>
+      <div class="box"><h3>Visitas por dia</h3><div class="chart" id="chart"></div></div>
+      <div class="cols">
+        <div class="box"><h3>Páginas mais vistas</h3><table><thead><tr><th>Página</th><th class="n">Visitas</th><th class="n">Pessoas</th></tr></thead><tbody id="tPag"></tbody></table></div>
+        <div class="box"><h3>De onde vieram</h3><table><thead><tr><th>Origem</th><th class="n">Visitas</th></tr></thead><tbody id="tOri"></tbody></table></div>
+      </div>
+      <p style="color:var(--mut);font-size:12px">Dica: abra o site uma vez neste aparelho depois de entrar aqui. As suas próprias visitas deixam de ser contadas.</p>
+    </section>
+
+    <!-- ARTIGOS -->
+    <section class="pane" id="p-artigos">
+      <div class="head"><div><h2>Artigos do blog</h2><p>Os 5 artigos iniciais continuam no site. Aqui ficam os novos que você publicar.</p></div>
+        <button class="btn btn-pri" id="bNovo">+ Novo artigo</button></div>
+      <div class="list" id="lista"></div>
+    </section>
+
+    <!-- EDITOR -->
+    <section class="pane" id="p-editor">
+      <div class="head"><div><h2 id="edTit">Novo artigo</h2><p>Escreva, coloque uma imagem e publique. Ele aparece na hora no blog.</p></div>
+        <button class="btn btn-out btn-sm" data-ir="artigos">← Voltar</button></div>
+      <label for="fTitulo">Título (o que a pessoa pesquisa no Google)</label>
+      <input id="fTitulo" maxlength="110" placeholder="Ex.: Como instalar o app na TV Box em 5 minutos">
+      <div class="g2">
+        <div><label for="fSlug">Endereço do artigo</label><input id="fSlug" placeholder="como-instalar-o-app-na-tv-box"></div>
+        <div class="g2" style="grid-template-columns:1fr 110px">
+          <div><label for="fCat">Categoria</label><select id="fCat"><option>Dicas</option><option>Guias</option><option>Comparativos</option><option>Planos</option><option>Novidades</option><option>Esportes</option></select></div>
+          <div><label for="fTempo">Leitura (min)</label><input id="fTempo" type="number" min="1" max="30" value="4"></div>
+        </div>
+      </div>
+      <label for="fResumo">Resumo (aparece no Google e no blog, até 160 letras)</label>
+      <textarea id="fResumo" rows="2" maxlength="170"></textarea>
+      <label>Imagem de capa (16:9)</label>
+      <div class="capa" id="capa">Toque para escolher a imagem</div>
       <input type="file" id="fImg" accept="image/*" hidden>
-      <div class="hint">Formato deitado (16:9). A imagem é otimizada automaticamente.</div>
-      <label for="fResumo">Resumo para o Google <span class="cnt" id="cResumo">0/160</span></label>
-      <textarea id="fResumo" rows="4" maxlength="200" placeholder="Uma ou duas frases que aparecem no Google e no card do blog."></textarea>
-      <div class="row" style="gap:10px">
-        <div style="flex:1;min-width:130px"><label for="fCat">Categoria</label>
-          <select id="fCat"><option>Dicas</option><option>Guias</option><option>Comparativos</option><option>Planos</option><option>Novidades</option><option>Esportes</option><option>Filmes e Séries</option></select></div>
-        <div style="width:110px"><label for="fMin">Leitura (min)</label><input id="fMin" type="number" min="1" max="60" value="3"></div>
+      <label>Texto do artigo</label>
+      <div class="bar">
+        <button type="button" data-c="h2">Subtítulo</button>
+        <button type="button" data-c="p">Parágrafo</button>
+        <button type="button" data-c="bold"><b>N</b></button>
+        <button type="button" data-c="insertUnorderedList">• Lista</button>
+        <button type="button" data-c="insertOrderedList">1. Lista</button>
+        <button type="button" data-c="link">🔗 Link</button>
+        <button type="button" data-c="whats">💬 Botão WhatsApp</button>
       </div>
-      <div class="pub">
-        <button class="btn btn-out" id="bPrev">👁️ Pré-visualizar</button>
-        <button class="btn btn-pri" id="bPub">🚀 Publicar artigo</button>
-        <button class="btn btn-out" id="bCancel" style="display:none">Cancelar edição</button>
+      <div id="ed" contenteditable="true"></div>
+      <label class="chk"><input type="checkbox" id="fPub" checked> Publicado (desmarque para salvar como rascunho)</label>
+      <div class="rowb">
+        <button class="btn btn-pri" id="bSalvar">💾 Salvar e publicar</button>
+        <a class="btn btn-out" id="bVer" target="_blank" rel="noopener" style="display:none">Ver no site ↗</a>
       </div>
-      <div class="hint" style="margin-top:10px">Depois de publicar, o artigo aparece no site em 1 a 2 minutos.</div>
-    </div></div>
-  </div>
-</section>
+      <div class="msg" id="edMsg"></div>
+    </section>
 
-<!-- CONFIG -->
-<section class="pane" id="p-config">
-  <div class="head"><div><h2>Configurações</h2><p>Ficam salvas só neste aparelho. Faça uma vez em cada celular ou computador que for usar.</p></div></div>
-  <div class="box">
-    <h3>1. Publicação de artigos (GitHub) <span class="pill" id="pillGh">não conectado</span></h3>
-    <ol class="steps" style="margin:10px 0 6px">
-      <li>No GitHub, abra <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">criar token</a>.</li>
-      <li>Nome: “Admin site”. Expiração: 1 ano. Em <b>Repository access</b> escolha <b>Only select repositories</b> e marque o repositório do site.</li>
-      <li>Em <b>Permissions → Contents</b> escolha <b>Read and write</b>. Gere e cole o token abaixo.</li>
-    </ol>
-    <label for="cToken">Token do GitHub</label><input id="cToken" type="password" placeholder="github_pat_…" autocomplete="off">
-    <div class="row" style="gap:10px">
-      <div style="flex:1;min-width:160px"><label for="cOwner">Usuário</label><input id="cOwner"></div>
-      <div style="flex:2;min-width:200px"><label for="cRepo">Repositório</label><input id="cRepo"></div>
-      <div style="width:110px"><label for="cBranch">Branch</label><input id="cBranch"></div>
-    </div>
-  </div>
-  <div class="box">
-    <h3>2. Contador de visitas (GoatCounter, grátis)</h3>
-    <ol class="steps" style="margin:10px 0 6px">
-      <li>Crie a conta em <a href="https://www.goatcounter.com/signup" target="_blank" rel="noopener">goatcounter.com/signup</a> usando o código <b>brasilunitv</b>.</li>
-      <li>No painel dele, vá em <b>Settings</b> e marque <b>“Allow adding visitor counts on your website”</b>. Salve.</li>
-    </ol>
-    <label for="cGc">Código do GoatCounter</label><input id="cGc">
-    <div class="hint">Se usar outro código, troque também no arquivo <code>js/stats.js</code> do site.</div>
-  </div>
-  <div class="box">
-    <h3>3. Google Search Console</h3>
-    <ol class="steps" style="margin:10px 0 6px">
-      <li>Adicione o domínio no <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console</a> (tipo “Domínio”) e envie o <code>sitemap.xml</code>.</li>
-      <li>No <a href="https://console.cloud.google.com/apis/library/searchconsole.googleapis.com" target="_blank" rel="noopener">Google Cloud</a>, ative a <b>Google Search Console API</b>.</li>
-      <li>Em <b>APIs e serviços → Tela de consentimento OAuth</b>, crie como “Externo” e adicione o Gmail do Paulo em “Usuários de teste”.</li>
-      <li>Em <b>Credenciais → Criar ID do cliente OAuth → Aplicativo da Web</b>, coloque em “Origens JavaScript autorizadas” o endereço do site (com e sem www). Cole o ID abaixo.</li>
-    </ol>
-    <label for="cGid">ID do cliente Google (OAuth)</label><input id="cGid" placeholder="…apps.googleusercontent.com">
-    <label for="cProp">Propriedade do Search Console</label><input id="cProp">
-    <label for="cSite">Endereço do site</label><input id="cSite">
-  </div>
-  <button class="btn btn-pri" id="bSaveCfg">Salvar configurações</button>
-</section>
-</main>
+    <!-- GOOGLE -->
+    <section class="pane" id="p-google">
+      <div class="head"><div><h2>Google (Search Console)</h2><p>Cliques, pesquisas e posição do site no Google.</p></div>
+        <a class="btn btn-pri" href="https://search.google.com/search-console" target="_blank" rel="noopener">Abrir Search Console ↗</a></div>
+      <div class="box"><h3>Como acompanhar</h3>
+        <ol class="steps">
+          <li>Entre no <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Search Console</a> com o Gmail do site.</li>
+          <li>Em <b>Desempenho</b> você vê os cliques, as pesquisas que trouxeram gente e a posição de cada página.</li>
+          <li>Em <b>Sitemaps</b>, envie: <code id="sm"></code></li>
+          <li>Publicou um artigo novo? Em <b>Inspeção de URL</b>, cole o endereço do artigo e clique em <b>Solicitar indexação</b>. Isso acelera a entrada no Google.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
 </div>
-
-<div class="modal" id="modal"><div class="row" style="justify-content:space-between"><b>Pré-visualização</b><button class="btn btn-out btn-sm" id="bCloseM">Fechar ✕</button></div><iframe id="mFrame" title="Pré-visualização"></iframe></div>
-<div id="toast"></div>
+<div class="toast" id="toast"></div>
 
 <script>
-(function(){
-'use strict';
+var $=function(i){return document.getElementById(i)};
+function toast(t){var e=$('toast');e.textContent=t;e.classList.add('on');setTimeout(function(){e.classList.remove('on')},2600)}
+function msg(id,t,tipo){var e=$(id);e.className='msg '+(tipo||'err');e.innerHTML=t}
+var esc=function(t){var d=document.createElement('div');d.textContent=t==null?'':t;return d.innerHTML};
+var fmt=function(n){return (n||0).toLocaleString('pt-BR')};
+$('sm').textContent=location.origin+'/sitemap.xml';
+
+if(!window.SUPA||!SUPA.ok){
+  msg('lMsg','O painel ainda não está ligado ao Supabase. Cole a <b>Project URL</b> e a chave <b>anon public</b> no arquivo <code>js/stats.js</code> do GitHub.');
+  $('bEntrar').disabled=true;
+}
+var sb=(window.SUPA&&SUPA.ok)?supabase.createClient(SUPA.url,SUPA.key):null;
+try{localStorage.setItem('naoContar','1')}catch(e){}
+
 /* ---------- login ---------- */
-var LOGIN = 'paulo';
-var PASS_HASH = '14353b0baee0fc5c2300c682d8caf01ac9e5be752570a78fec1c7ead91991b34';
-var $ = function(id){return document.getElementById(id);};
-
-async function sha256(t){
-  var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t));
-  return Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
-}
-$('fLogin').addEventListener('submit', async function(e){
-  e.preventDefault();
-  var u = $('lUser').value.trim().toLowerCase();
-  var h = await sha256($('lPass').value);
-  if (u === LOGIN && h === PASS_HASH){ sessionStorage.setItem('unitv_admin','1'); abrir(); }
-  else { $('lErr').textContent = 'Login ou senha incorretos.'; }
-});
-$('bSair').onclick = function(){ sessionStorage.removeItem('unitv_admin'); location.reload(); };
-
-/* ---------- config ---------- */
-var DEF = {
-  ghOwner:'pinheiroadvrodrigo-source', ghRepo:'SITE-PAULO-TV-ASSINATURA-UNIQ', ghBranch:'main', ghToken:'',
-  gcCode:'brasilunitv', googleClientId:'',
-  gscProperty:'sc-domain:unitvbrasiloficial-br.com.br', siteUrl:'https://unitvbrasiloficial-br.com.br'
+$('fLogin').onsubmit=async function(e){e.preventDefault();if(!sb)return;$('bEntrar').disabled=true;
+  var r=await sb.auth.signInWithPassword({email:$('lEmail').value.trim(),password:$('lSenha').value});
+  $('bEntrar').disabled=false;
+  if(r.error) return msg('lMsg','E-mail ou senha incorretos.');
+  entrar();
 };
-var cfg;
-function loadCfg(){ try{ cfg = Object.assign({}, DEF, JSON.parse(localStorage.getItem('unitv_admin_cfg')||'{}')); }catch(e){ cfg = Object.assign({}, DEF); } }
-function saveCfg(){ try{ localStorage.setItem('unitv_admin_cfg', JSON.stringify(cfg)); }catch(e){} }
-var CFG_FIELDS = {cToken:'ghToken',cOwner:'ghOwner',cRepo:'ghRepo',cBranch:'ghBranch',cGc:'gcCode',cGid:'googleClientId',cProp:'gscProperty',cSite:'siteUrl'};
-function fillCfg(){
-  Object.keys(CFG_FIELDS).forEach(function(k){ $(k).value = cfg[CFG_FIELDS[k]] || ''; });
-  $('pillGh').textContent = cfg.ghToken ? 'token salvo' : 'não conectado';
-  $('pillGh').className = 'pill ' + (cfg.ghToken ? 'ok' : 'no');
-  $('lGcFull').href = 'https://' + encodeURIComponent(cfg.gcCode) + '.goatcounter.com';
-  $('lGscOpen').href = 'https://search.google.com/search-console/performance/search-analytics?resource_id=' + encodeURIComponent(cfg.gscProperty);
+$('bSair').onclick=async function(){await sb.auth.signOut();location.reload()};
+async function entrar(){$('login').style.display='none';$('app').style.display='block';carregarPainel();carregarArtigos()}
+if(sb) sb.auth.getSession().then(function(r){if(r.data.session)entrar()});
+
+/* ---------- abas ---------- */
+function ir(p){document.querySelectorAll('.pane').forEach(function(x){x.classList.toggle('on',x.id==='p-'+p)});
+  document.querySelectorAll('.tabs [data-p]').forEach(function(b){b.classList.toggle('on',b.dataset.p===p||(p==='editor'&&b.dataset.p==='artigos'))});scrollTo(0,0)}
+document.querySelectorAll('[data-p]').forEach(function(b){b.onclick=function(){ir(b.dataset.p)}});
+document.querySelectorAll('[data-ir]').forEach(function(b){b.onclick=function(){ir(b.dataset.ir)}});
+
+/* ---------- visitas ---------- */
+var dias=30;
+document.querySelectorAll('#segDias button').forEach(function(b){b.onclick=function(){
+  document.querySelectorAll('#segDias button').forEach(function(x){x.classList.toggle('on',x===b)});dias=+b.dataset.d;carregarPainel()}});
+function nomePagina(p){
+  if(p==='/'||p==='/index.html')return 'Página inicial';
+  if(p==='/blog/'||p==='/blog/index.html')return 'Blog (lista)';
+  var m=p.match(/\?a=(.+)$/);if(m)return 'Blog: '+decodeURIComponent(m[1]).replace(/-/g,' ');
+  m=p.match(/\/blog\/(.+)\.html$/);if(m)return 'Blog: '+m[1].replace(/-/g,' ');
+  return p}
+async function carregarPainel(){
+  var a=await Promise.all([sb.rpc('resumo_visitas',{dias:dias}),sb.rpc('visitas_por_dia',{dias:dias}),sb.rpc('origem_visitas',{dias:dias}),
+    sb.from('artigos').select('id',{count:'exact',head:true}).eq('publicado',true)]);
+  if(a[0].error){$('tPag').innerHTML='<tr><td colspan="3" class="vazio">Erro: '+esc(a[0].error.message)+'. Rodou o arquivo supabase.sql?</td></tr>';return}
+  var pag=a[0].data||[],dia=a[1].data||[],ori=a[2].data||[];
+  var tot=pag.reduce(function(s,x){return s+x.visitas},0);
+  var pes=dia.length?Math.max.apply(null,dia.map(function(d){return d.pessoas})):0;
+  $('kVis').textContent=fmt(tot);
+  $('kPes').textContent=fmt(dias===1?pes:dia.reduce(function(s,x){return s+x.pessoas},0));
+  $('kBlog').textContent=fmt(pag.filter(function(x){return x.pagina.indexOf('/blog')===0}).reduce(function(s,x){return s+x.visitas},0));
+  $('kArt').textContent=fmt(5+(a[3].count||0));
+  $('tPag').innerHTML=pag.length?pag.slice(0,30).map(function(x){return '<tr><td>'+esc(nomePagina(x.pagina))+'</td><td class="n">'+fmt(x.visitas)+'</td><td class="n">'+fmt(x.pessoas)+'</td></tr>'}).join(''):'<tr><td colspan="3" class="vazio">Nenhuma visita ainda neste período.</td></tr>';
+  $('tOri').innerHTML=ori.length?ori.map(function(x){return '<tr><td>'+esc(x.origem)+'</td><td class="n">'+fmt(x.visitas)+'</td></tr>'}).join(''):'<tr><td colspan="2" class="vazio">—</td></tr>';
+  var mx=Math.max.apply(null,dia.map(function(d){return d.visitas}).concat(1));
+  $('chart').innerHTML=dia.length?dia.map(function(d){var dt=d.dia.split('-');return '<div style="height:'+Math.max(2,d.visitas/mx*100)+'%" data-t="'+dt[2]+'/'+dt[1]+': '+d.visitas+' visitas"></div>'}).join(''):'<p class="vazio" style="width:100%">Sem dados ainda.</p>';
 }
-$('bSaveCfg').onclick = function(){
-  Object.keys(CFG_FIELDS).forEach(function(k){ cfg[CFG_FIELDS[k]] = $(k).value.trim(); });
-  cfg.siteUrl = cfg.siteUrl.replace(/\/+$/,'');
-  saveCfg(); fillCfg(); toast('Configurações salvas.', 'ok');
-  carregarPosts().then(carregarVisitas);
+
+/* ---------- artigos ---------- */
+var atual=null,imgUrl='';
+async function carregarArtigos(){
+  var r=await sb.from('artigos').select('id,slug,titulo,categoria,imagem,publicado,criado_em').order('criado_em',{ascending:false});
+  var L=r.data||[];
+  $('lista').innerHTML=L.length?L.map(function(a){return '<div class="it"><div class="th" style="background-image:url(\''+esc(a.imagem||'')+'\')"></div><div><b>'+esc(a.titulo)+'<span class="pill '+(a.publicado?'pub':'ras')+'">'+(a.publicado?'publicado':'rascunho')+'</span></b><small>'+esc(a.categoria)+' · '+new Date(a.criado_em).toLocaleDateString('pt-BR')+'</small></div><div class="acts"><a class="btn btn-out btn-sm" target="_blank" href="/blog/artigo.html?a='+encodeURIComponent(a.slug)+'">Ver</a><button class="btn btn-out btn-sm" data-ed="'+a.id+'">Editar</button><button class="btn btn-out btn-sm" data-del="'+a.id+'">Excluir</button></div></div>'}).join(''):'<p class="vazio">Nenhum artigo novo ainda. Clique em “+ Novo artigo”.</p>';
+}
+$('lista').onclick=async function(e){
+  var ed=e.target.closest('[data-ed]'),del=e.target.closest('[data-del]');
+  if(ed){var r=await sb.from('artigos').select('*').eq('id',ed.dataset.ed).single();abrirEditor(r.data)}
+  if(del&&confirm('Excluir este artigo? Ele sai do site na hora.')){var r2=await sb.from('artigos').delete().eq('id',del.dataset.del);if(r2.error)toast('Erro: '+r2.error.message);else{toast('Artigo excluído');carregarArtigos();carregarPainel()}}
 };
-
-/* ---------- util ---------- */
-function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-function fmt(n){ return (n||0).toLocaleString('pt-BR'); }
-function hoje(){ var d=new Date(); d.setMinutes(d.getMinutes()-d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
-function dataBR(s){ if(!s) return ''; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
-function slugify(t){ return t.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80).replace(/-+$/,''); }
-var tt;
-function toast(msg, tipo){ var t=$('toast'); t.textContent=msg; t.className='show '+(tipo||''); clearTimeout(tt); tt=setTimeout(function(){t.className='';}, 4500); }
-function aviso(el, html, ok){ $(el).innerHTML = html ? '<div class="aviso'+(ok?' ok':'')+'">'+html+'</div>' : ''; }
-
-/* ---------- tabs ---------- */
-function ir(p){
-  document.querySelectorAll('.tab').forEach(function(b){ b.classList.toggle('on', b.dataset.p===p); });
-  document.querySelectorAll('.pane').forEach(function(s){ s.classList.toggle('on', s.id==='p-'+p); });
-  window.scrollTo(0,0);
+function slugify(t){return t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,80)}
+var slugManual=false;
+$('fTitulo').oninput=function(){if(!slugManual)$('fSlug').value=slugify(this.value)};
+$('fSlug').oninput=function(){slugManual=true};
+function abrirEditor(a){
+  atual=a||null;slugManual=!!a;$('edMsg').className='msg';
+  $('edTit').textContent=a?'Editar artigo':'Novo artigo';
+  $('fTitulo').value=a?a.titulo:'';$('fSlug').value=a?a.slug:'';$('fCat').value=a?a.categoria:'Dicas';
+  $('fTempo').value=a?a.tempo_leitura:4;$('fResumo').value=a?(a.resumo||''):'';$('fPub').checked=a?a.publicado:true;
+  $('ed').innerHTML=a?a.conteudo:'<p>Comece a escrever aqui…</p>';
+  imgUrl=a?(a.imagem||''):'';mostraCapa();
+  $('bVer').style.display=a?'inline-flex':'none';if(a)$('bVer').href='/blog/artigo.html?a='+encodeURIComponent(a.slug);
+  ir('editor');
 }
-document.querySelectorAll('.tab').forEach(function(b){ b.onclick=function(){ if(b.dataset.p==='novo' && !editSlug) limparEditor(); ir(b.dataset.p); }; });
-document.querySelectorAll('[data-go]').forEach(function(b){ b.onclick=function(){ limparEditor(); ir(b.dataset.go); }; });
-
-/* ---------- GitHub ---------- */
-function b64enc(str){ var bytes=new TextEncoder().encode(str), bin=''; for(var i=0;i<bytes.length;i+=0x8000){ bin+=String.fromCharCode.apply(null, bytes.subarray(i,i+0x8000)); } return btoa(bin); }
-function b64dec(b64){ var bin=atob(b64.replace(/\n/g,'')), bytes=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return new TextDecoder().decode(bytes); }
-async function gh(path, opts){
-  opts = opts || {};
-  var r = await fetch('https://api.github.com/repos/'+cfg.ghOwner+'/'+cfg.ghRepo+path, {
-    method: opts.method || 'GET',
-    headers: {'Authorization':'Bearer '+cfg.ghToken,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28', 'Content-Type':'application/json'},
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-    cache: 'no-store'
-  });
-  if (r.status === 404 && opts.allow404) return null;
-  if (!r.ok){
-    var m=''; try{ m=(await r.json()).message; }catch(e){}
-    if (r.status===401) throw new Error('Token do GitHub inválido ou vencido. Atualize em Configurações.');
-    if (r.status===403) throw new Error('O token não tem permissão de escrita neste repositório.');
-    throw new Error('GitHub '+r.status+': '+m);
-  }
-  return r.status===204 ? null : r.json();
-}
-async function ghLer(path){
-  var d = await gh('/contents/'+path.split('/').map(encodeURIComponent).join('/')+'?ref='+encodeURIComponent(cfg.ghBranch), {allow404:true});
-  return d ? b64dec(d.content) : null;
-}
-/* files: [{path, text}] | [{path, base64}] | [{path, del:true}] — tudo num só commit */
-async function ghCommit(files, msg){
-  var ref = await gh('/git/ref/heads/'+encodeURIComponent(cfg.ghBranch));
-  var head = ref.object.sha;
-  var commit = await gh('/git/commits/'+head);
-  var tree = [];
-  for (var i=0;i<files.length;i++){
-    var f = files[i];
-    if (f.del) tree.push({path:f.path, mode:'100644', type:'blob', sha:null});
-    else if (f.base64){ var b = await gh('/git/blobs',{method:'POST',body:{content:f.base64,encoding:'base64'}}); tree.push({path:f.path,mode:'100644',type:'blob',sha:b.sha}); }
-    else tree.push({path:f.path, mode:'100644', type:'blob', content:f.text});
-  }
-  var nt = await gh('/git/trees',{method:'POST',body:{base_tree:commit.tree.sha, tree:tree}});
-  var nc = await gh('/git/commits',{method:'POST',body:{message:msg, tree:nt.sha, parents:[head]}});
-  await gh('/git/refs/heads/'+encodeURIComponent(cfg.ghBranch),{method:'PATCH',body:{sha:nc.sha}});
-}
-
-/* ---------- posts ---------- */
-var posts = [];
-async function carregarPosts(){
-  try{
-    if (cfg.ghToken){ var t = await ghLer('blog/posts.json'); posts = t ? JSON.parse(t) : []; }
-    else { var r = await fetch('/blog/posts.json?'+Date.now()); posts = r.ok ? await r.json() : []; }
-  }catch(e){ posts = []; toast('Não consegui carregar a lista de artigos: '+e.message, 'err'); }
-  posts.sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); });
-  renderArtigos();
-  $('kArts').textContent = posts.length;
-}
-function imgUrl(p){ return '/blog/'+p.image; }
-function renderArtigos(){
-  var tb = $('tArts');
-  if (!posts.length){ tb.innerHTML = '<tr><td colspan="3" class="vazio">Nenhum artigo ainda.</td></tr>'; return; }
-  tb.innerHTML = posts.map(function(p){
-    return '<tr><td><div class="art"><img src="'+esc(imgUrl(p))+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'"><div><div class="t">'+esc(p.title)+'</div><div class="s">'+esc(p.category)+' · '+esc(p.readTime)+' min</div></div></div></td>'+
-      '<td style="white-space:nowrap">'+dataBR(p.date)+'</td>'+
-      '<td><div class="acts"><a class="btn btn-out btn-sm" href="/blog/'+esc(p.slug)+'.html" target="_blank" rel="noopener">Ver</a>'+
-      '<button class="btn btn-out btn-sm" data-ed="'+esc(p.slug)+'">Editar</button>'+
-      '<button class="btn btn-del btn-sm" data-rm="'+esc(p.slug)+'">Excluir</button></div></td></tr>';
-  }).join('');
-  tb.querySelectorAll('[data-ed]').forEach(function(b){ b.onclick=function(){ editar(b.dataset.ed); }; });
-  tb.querySelectorAll('[data-rm]').forEach(function(b){ b.onclick=function(){ excluir(b.dataset.rm, b); }; });
-}
-
-/* ---------- visitas (GoatCounter) ---------- */
-async function contar(path){
-  try{
-    var r = await fetch('https://'+encodeURIComponent(cfg.gcCode)+'.goatcounter.com/counter/'+encodeURIComponent(path)+'.json', {cache:'no-store'});
-    if (r.status===404) return {c:0,u:0,ok:true};
-    if (!r.ok) return {c:0,u:0,ok:false};
-    var j = await r.json();
-    var n = function(v){ return parseInt(String(v||'0').replace(/\D/g,''),10)||0; };
-    return {c:n(j.count), u:n(j.count_unique), ok:true};
-  }catch(e){ return {c:0,u:0,ok:false}; }
-}
-async function carregarVisitas(){
-  aviso('vAviso','');
-  $('tVisitas').innerHTML = '<tr><td colspan="3" class="vazio">Carregando…</td></tr>';
-  var paths = ['TOTAL','/','/blog/','/blog/index.html'].concat(posts.map(function(p){return '/blog/'+p.slug+'.html';}));
-  var res = await Promise.all(paths.map(contar));
-  if (res.every(function(x){return !x.ok;})){
-    aviso('vAviso','Ainda não consegui ler o contador. Confira em <b>Configurações → 2</b> se a conta GoatCounter “'+esc(cfg.gcCode)+'” foi criada e se a opção <b>“Allow adding visitor counts on your website”</b> está marcada.');
-  } else if (!cfg.ghToken){
-    aviso('vAviso','Primeira vez neste aparelho? Abra <b>⚙️ Configurações</b> para ligar a publicação de artigos e o Google.');
-  }
-  $('kTotal').textContent = fmt(res[0].c);
-  $('kHome').textContent = fmt(res[1].c);
-  var arts = posts.map(function(p,i){ return {p:p, v:res[4+i]}; });
-  var blogTotal = res[2].c + res[3].c + arts.reduce(function(s,a){return s+a.v.c;},0);
-  $('kBlog').textContent = fmt(blogTotal);
-  arts.sort(function(a,b){ return b.v.c - a.v.c; });
-  var max = Math.max(1, arts.length ? arts[0].v.c : 1);
-  $('tVisitas').innerHTML = arts.length ? arts.map(function(a){
-    return '<tr><td><div class="art"><img src="'+esc(imgUrl(a.p))+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'"><div style="flex:1"><div class="t">'+esc(a.p.title)+'</div><div class="bar" style="width:'+Math.round(a.v.c/max*100)+'%"></div></div></div></td>'+
-      '<td class="n"><b>'+fmt(a.v.c)+'</b></td><td class="n hide-m">'+fmt(a.v.u)+'</td></tr>';
-  }).join('') : '<tr><td colspan="3" class="vazio">Nenhum artigo ainda.</td></tr>';
-}
-$('bRefreshV').onclick = carregarVisitas;
-
-/* ---------- Google Search Console ---------- */
-var gToken = null, gClient = null, dias = 28;
-document.querySelectorAll('#segDias button').forEach(function(b){ b.onclick=function(){
-  document.querySelectorAll('#segDias button').forEach(function(x){x.classList.toggle('on',x===b);});
-  dias = +b.dataset.d; if (gToken) carregarGSC();
-};});
-function carregarGIS(){ return new Promise(function(ok,no){ if (window.google && google.accounts) return ok(); var s=document.createElement('script'); s.src='https://accounts.google.com/gsi/client'; s.onload=ok; s.onerror=no; document.head.appendChild(s); }); }
-$('bGConn').onclick = async function(){
-  if (!cfg.googleClientId){ aviso('gAviso','Falta o <b>ID do cliente Google</b>. Siga o passo 3 em <a href="#" id="goCfg">Configurações</a>.'); $('goCfg').onclick=function(e){e.preventDefault();ir('config');}; return; }
-  try{ await carregarGIS(); }catch(e){ toast('Não consegui carregar o login do Google.', 'err'); return; }
-  gClient = gClient || google.accounts.oauth2.initTokenClient({
-    client_id: cfg.googleClientId,
-    scope: 'https://www.googleapis.com/auth/webmasters.readonly',
-    callback: function(resp){ if (resp.error){ toast('Google: '+resp.error,'err'); return; } gToken = resp.access_token; $('bGConn').textContent='✓ Conectado'; carregarGSC(); }
-  });
-  gClient.requestAccessToken();
+$('bNovo').onclick=function(){abrirEditor(null)};
+function mostraCapa(){var c=$('capa');c.style.backgroundImage=imgUrl?'url("'+imgUrl+'")':'';c.textContent=imgUrl?'':'Toque para escolher a imagem'}
+$('capa').onclick=function(){$('fImg').click()};
+$('fImg').onchange=async function(){
+  var f=this.files[0];if(!f)return;if(f.size>5e6)return toast('Imagem muito grande (máx. 5 MB)');
+  $('capa').textContent='Enviando…';
+  var nome=Date.now()+'-'+slugify(f.name.replace(/\.[^.]+$/,''))+'.'+(f.name.split('.').pop()||'jpg').toLowerCase();
+  var r=await sb.storage.from('blog').upload(nome,f,{cacheControl:'31536000',upsert:false});
+  if(r.error){toast('Erro ao enviar: '+r.error.message);mostraCapa();return}
+  imgUrl=sb.storage.from('blog').getPublicUrl(nome).data.publicUrl;mostraCapa();toast('Imagem enviada');this.value='';
 };
-async function gsc(body){
-  var r = await fetch('https://searchconsole.googleapis.com/webmasters/v3/sites/'+encodeURIComponent(cfg.gscProperty)+'/searchAnalytics/query', {
-    method:'POST', headers:{'Authorization':'Bearer '+gToken,'Content-Type':'application/json'}, body:JSON.stringify(body)
-  });
-  if (r.status===401){ gToken=null; $('bGConn').textContent='Conectar com Google'; throw new Error('A conexão com o Google expirou. Toque em “Conectar com Google” de novo.'); }
-  if (r.status===403) throw new Error('Esta conta Google não tem acesso à propriedade “'+cfg.gscProperty+'” no Search Console.');
-  if (!r.ok){ var m=''; try{m=(await r.json()).error.message;}catch(e){} throw new Error('Search Console: '+m); }
-  return (await r.json()).rows || [];
-}
-function intervalo(){ var f=new Date(), i=new Date(); i.setDate(i.getDate()-dias); var iso=function(d){return d.toISOString().slice(0,10);}; return {startDate:iso(i), endDate:iso(f)}; }
-function tituloDaUrl(u){
-  var path; try{ path = new URL(u).pathname; }catch(e){ return u; }
-  if (path==='/' ) return 'Página inicial';
-  if (path==='/blog/'||path==='/blog/index.html') return 'Blog (lista de artigos)';
-  var p = posts.find(function(x){ return '/blog/'+x.slug+'.html'===path; });
-  return p ? p.title : path;
-}
-function inspecionar(url){ return 'https://search.google.com/search-console/inspect?resource_id='+encodeURIComponent(cfg.gscProperty)+'&id='+encodeURIComponent(url); }
-async function carregarGSC(){
-  aviso('gAviso','');
-  $('tGPages').innerHTML = '<tr><td colspan="6" class="vazio">Carregando…</td></tr>';
-  try{
-    var iv = intervalo();
-    var res = await Promise.all([
-      gsc(Object.assign({}, iv)),
-      gsc(Object.assign({dimensions:['page'], rowLimit:500}, iv)),
-      gsc(Object.assign({dimensions:['query'], rowLimit:25}, iv))
-    ]);
-    var tot = res[0][0] || {clicks:0,impressions:0,ctr:0,position:0};
-    $('gClk').textContent = fmt(tot.clicks); $('gImp').textContent = fmt(tot.impressions);
-    $('gCtr').textContent = (tot.ctr*100).toFixed(1).replace('.',',')+'%';
-    $('gPos').textContent = tot.position ? tot.position.toFixed(1).replace('.',',') : '—';
-    var vistos = {};
-    var linhas = res[1].map(function(r){ var u=r.keys[0]; try{ vistos[new URL(u).pathname]=1; }catch(e){} return r; });
-    posts.forEach(function(p){ var path='/blog/'+p.slug+'.html'; if(!vistos[path]) linhas.push({keys:[cfg.siteUrl+path],clicks:0,impressions:0,ctr:0,position:0,semDados:true}); });
-    $('tGPages').innerHTML = linhas.map(function(r){
-      var u=r.keys[0];
-      return '<tr><td><div class="t">'+esc(tituloDaUrl(u))+'</div><div class="hint">'+(r.semDados?'<span class="pill">ainda sem dados no Google</span>':esc(u.replace(/^https?:\/\//,'')))+'</div></td>'+
-        '<td class="n"><b>'+fmt(r.clicks)+'</b></td><td class="n">'+fmt(r.impressions)+'</td>'+
-        '<td class="n hide-m">'+(r.ctr*100).toFixed(1).replace('.',',')+'%</td><td class="n">'+(r.position?r.position.toFixed(1).replace('.',','):'—')+'</td>'+
-        '<td class="n"><a class="btn btn-out btn-sm" href="'+esc(inspecionar(u))+'" target="_blank" rel="noopener">Inspecionar</a></td></tr>';
-    }).join('') || '<tr><td colspan="6" class="vazio">Sem dados neste período.</td></tr>';
-    $('tGQueries').innerHTML = res[2].length ? res[2].map(function(r){
-      return '<tr><td>'+esc(r.keys[0])+'</td><td class="n"><b>'+fmt(r.clicks)+'</b></td><td class="n">'+fmt(r.impressions)+'</td><td class="n">'+r.position.toFixed(1).replace('.',',')+'</td></tr>';
-    }).join('') : '<tr><td colspan="4" class="vazio">O Google ainda não registrou pesquisas neste período. Sites novos levam alguns dias.</td></tr>';
-  }catch(e){
-    aviso('gAviso', esc(e.message));
-    $('tGPages').innerHTML = '<tr><td colspan="6" class="vazio">—</td></tr>';
-  }
-}
-
-/* ---------- editor ---------- */
-var editor = $('editor'), htmlBox = $('htmlBox'), modoHtml = false, editSlug = null, imgNova = null, imgAtual = null;
-$('tb').addEventListener('mousedown', function(e){ if (e.target.closest('button')) e.preventDefault(); });
-$('tb').addEventListener('click', function(e){
-  var b = e.target.closest('button'); if (!b) return;
-  var c = b.dataset.c;
-  if (c==='html'){ alternarHtml(); return; }
-  if (modoHtml) return;
-  editor.focus();
-  if (c==='link'){ var u = prompt('Cole o link (ex.: https://wa.me/55…)'); if (u) document.execCommand('createLink', false, u); }
-  else if (c==='formatBlock') document.execCommand('formatBlock', false, '<'+b.dataset.v+'>');
-  else document.execCommand(c, false, null);
-  contarPalavras();
-});
-function alternarHtml(){
-  if (!modoHtml){ htmlBox.value = limparHtml(editor.innerHTML).replace(/(<\/(p|h2|h3|ul|ol|table)>)/g,'$1\n'); editor.style.display='none'; htmlBox.style.display='block'; }
-  else { editor.innerHTML = limparHtml(htmlBox.value); htmlBox.style.display='none'; editor.style.display='block'; }
-  modoHtml = !modoHtml; contarPalavras();
-}
-function conteudo(){ return limparHtml(modoHtml ? htmlBox.value : editor.innerHTML); }
-
-var PERMITIDAS = {P:1,H2:1,H3:1,STRONG:1,EM:1,UL:1,OL:1,LI:1,A:1,BR:1,TABLE:1,THEAD:1,TBODY:1,TR:1,TH:1,TD:1,BLOCKQUOTE:1};
-var TROCAR = {B:'strong',I:'em',H1:'h2',H4:'h3',H5:'h3',H6:'h3',DIV:'p'};
-function limparHtml(html){
-  var doc = new DOMParser().parseFromString('<div>'+html+'</div>','text/html');
-  function limpar(no, dentroBloco){
-    var out = document.createDocumentFragment();
-    no.childNodes.forEach(function(n){
-      if (n.nodeType===3){ out.appendChild(document.createTextNode(n.nodeValue)); return; }
-      if (n.nodeType!==1) return;
-      var tag = n.tagName;
-      if (/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|META|LINK|NOSCRIPT|SVG|IMG|VIDEO|AUDIO|FORM|INPUT|BUTTON)$/.test(tag)) return;
-      var novo = TROCAR[tag] ? TROCAR[tag].toUpperCase() : tag;
-      if (novo==='P' && dentroBloco){ var f=limpar(n,true); out.appendChild(f); out.appendChild(document.createElement('br')); return; }
-      if (!PERMITIDAS[novo]){ out.appendChild(limpar(n, dentroBloco)); return; }
-      var el = document.createElement(novo.toLowerCase());
-      if (novo==='A'){
-        var href = (n.getAttribute('href')||'').trim();
-        if (/^(https?:|mailto:|tel:|\/|#|[a-z0-9-]+\.html)/i.test(href)){ el.setAttribute('href', href); if (/^https?:/i.test(href) && href.indexOf(cfg.siteUrl)!==0){ el.setAttribute('target','_blank'); el.setAttribute('rel','noopener'); } }
-      }
-      el.appendChild(limpar(n, dentroBloco || /^(P|H2|H3|LI|TD|TH)$/.test(novo)));
-      out.appendChild(el);
-    });
-    return out;
-  }
-  var wrap = document.createElement('div');
-  wrap.appendChild(limpar(doc.body.firstChild, false));
-  // texto solto vira parágrafo
-  var final = document.createElement('div'), p = null;
-  Array.from(wrap.childNodes).forEach(function(n){
-    var bloco = n.nodeType===1 && /^(P|H2|H3|UL|OL|TABLE|BLOCKQUOTE)$/.test(n.tagName);
-    if (bloco){ p=null; final.appendChild(n); }
-    else { if (n.nodeType===3 && !n.nodeValue.trim()) return; if (n.nodeType===1 && n.tagName==='BR'){ p=null; return; } if(!p){ p=document.createElement('p'); final.appendChild(p);} p.appendChild(n); }
-  });
-  final.querySelectorAll('p,h2,h3,li').forEach(function(e){ if (!e.textContent.trim() && !e.querySelector('br')) e.remove(); });
-  return final.innerHTML.trim();
-}
-function contarPalavras(){
-  var t = (modoHtml ? htmlBox.value.replace(/<[^>]+>/g,' ') : editor.innerText) || '';
-  var n = (t.trim().match(/\S+/g)||[]).length;
-  $('wordInfo').textContent = n+' palavras' + (n && n<300 ? ' · artigos com 600+ palavras costumam ir melhor no Google' : '');
-  if (!$('fMin').dataset.manual) $('fMin').value = Math.max(2, Math.ceil(n/200));
-}
-editor.addEventListener('input', contarPalavras); htmlBox.addEventListener('input', contarPalavras);
-$('fMin').addEventListener('input', function(){ this.dataset.manual='1'; });
-$('fTitulo').addEventListener('input', function(){ if (!editSlug && !$('fSlug').dataset.manual){ $('fSlug').value = slugify(this.value); mostrarSlug(); } });
-$('fSlug').addEventListener('input', function(){ this.dataset.manual='1'; mostrarSlug(); });
-function mostrarSlug(){ var s=slugify($('fSlug').value); $('slugHint').textContent = s ? cfg.siteUrl.replace(/^https?:\/\//,'')+'/blog/'+s+'.html' : ''; }
-$('fResumo').addEventListener('input', function(){ var n=this.value.length; $('cResumo').textContent=n+'/160'; $('cResumo').className='cnt'+(n>160?' bad':''); });
-
-$('capaPrev').onclick = function(){ $('fImg').click(); };
-$('fImg').onchange = async function(){
-  var f = this.files[0]; if (!f) return;
-  try{ imgNova = await paraWebp(f); $('capaPrev').style.backgroundImage='url('+imgNova.url+')'; $('capaPrev').textContent=''; }
-  catch(e){ toast('Não consegui ler essa imagem. Tente JPG ou PNG.','err'); }
+document.querySelectorAll('.bar button').forEach(function(b){b.onmousedown=function(e){e.preventDefault()};b.onclick=function(){
+  var c=b.dataset.c;$('ed').focus();
+  if(c==='h2'||c==='p')document.execCommand('formatBlock',false,c);
+  else if(c==='link'){var u=prompt('Endereço do link (https://...)');if(u)document.execCommand('createLink',false,u)}
+  else if(c==='whats'){var w='https://wa.me/5519996386341?text='+encodeURIComponent('Olá! Gostaria de fazer um teste do UniTV');
+    document.execCommand('insertHTML',false,'<p><a href="'+w+'" target="_blank" rel="noopener"><strong>💬 Fazer meu teste grátis no WhatsApp</strong></a></p>')}
+  else document.execCommand(c,false,null);
+}});
+$('ed').addEventListener('paste',function(e){e.preventDefault();var t=(e.clipboardData||window.clipboardData).getData('text/plain');
+  document.execCommand('insertHTML',false,t.split(/\n{2,}/).map(function(p){return '<p>'+esc(p).replace(/\n/g,'<br>')+'</p>'}).join(''))});
+$('bSalvar').onclick=async function(){
+  var d={titulo:$('fTitulo').value.trim(),slug:slugify($('fSlug').value||$('fTitulo').value),categoria:$('fCat').value,
+    tempo_leitura:+$('fTempo').value||4,resumo:$('fResumo').value.trim(),imagem:imgUrl||null,conteudo:$('ed').innerHTML,
+    publicado:$('fPub').checked,atualizado_em:new Date().toISOString()};
+  if(!d.titulo)return msg('edMsg','Coloque um título.');
+  if(!d.slug)return msg('edMsg','Coloque o endereço do artigo.');
+  if($('ed').innerText.trim().length<50)return msg('edMsg','O texto está muito curto.');
+  this.disabled=true;
+  var r=atual?await sb.from('artigos').update(d).eq('id',atual.id).select().single():await sb.from('artigos').insert(d).select().single();
+  this.disabled=false;
+  if(r.error)return msg('edMsg',r.error.code==='23505'?'Já existe um artigo com esse endereço. Mude o endereço.':'Erro: '+esc(r.error.message));
+  atual=r.data;var link=location.origin+'/blog/artigo.html?a='+encodeURIComponent(r.data.slug);
+  $('bVer').href=link;$('bVer').style.display='inline-flex';
+  msg('edMsg',(d.publicado?'✅ Publicado! ':'💾 Rascunho salvo. ')+(d.publicado?'Endereço: <a href="'+link+'" target="_blank" style="color:#bbf7d0">'+esc(link)+'</a><br>Para entrar mais rápido no Google, cole esse endereço na Inspeção de URL do Search Console.':''),'ok');
+  carregarArtigos();
 };
-function paraWebp(file){
-  return new Promise(function(ok,no){
-    var img = new Image(), u = URL.createObjectURL(file);
-    img.onload = function(){
-      var W = Math.min(1280, img.naturalWidth), H = Math.round(W*9/16);
-      var c = document.createElement('canvas'); c.width=W; c.height=H;
-      var x = c.getContext('2d');
-      var r = Math.max(W/img.naturalWidth, H/img.naturalHeight), w=img.naturalWidth*r, h=img.naturalHeight*r;
-      x.drawImage(img, (W-w)/2, (H-h)/2, w, h);
-      var data = c.toDataURL('image/webp', 0.82);
-      var ext = 'webp';
-      if (data.indexOf('data:image/webp')!==0){ data = c.toDataURL('image/jpeg', 0.85); ext='jpg'; }
-      URL.revokeObjectURL(u);
-      ok({url:data, base64:data.split(',')[1], ext:ext});
-    };
-    img.onerror = no; img.src = u;
-  });
-}
-function limparEditor(){
-  editSlug=null; imgNova=null; imgAtual=null;
-  $('edTitle').textContent='Novo artigo'; $('bPub').textContent='🚀 Publicar artigo'; $('bCancel').style.display='none';
-  ['fTitulo','fSlug','fResumo'].forEach(function(k){ $(k).value=''; delete $(k).dataset.manual; });
-  $('fSlug').disabled=false; $('fCat').value='Dicas'; $('fMin').value=3; delete $('fMin').dataset.manual;
-  editor.innerHTML=''; htmlBox.value=''; if (modoHtml) alternarHtml();
-  $('capaPrev').style.backgroundImage=''; $('capaPrev').textContent='Toque para escolher a imagem';
-  $('fImg').value=''; $('slugHint').textContent=''; $('cResumo').textContent='0/160'; aviso('edAviso','');
-  contarPalavras();
-}
-$('bCancel').onclick = function(){ limparEditor(); ir('artigos'); };
-
-async function editar(slug){
-  if (!cfg.ghToken){ toast('Para editar, salve o token do GitHub em Configurações.','err'); ir('config'); return; }
-  var p = posts.find(function(x){return x.slug===slug;}); if (!p) return;
-  limparEditor(); ir('novo');
-  aviso('edAviso','Carregando o artigo…', true);
-  try{
-    var html = await ghLer('blog/'+slug+'.html');
-    var doc = new DOMParser().parseFromString(html||'','text/html');
-    var txt = doc.querySelector('.txt');
-    editSlug = slug; imgAtual = p.image;
-    $('edTitle').textContent='Editar artigo'; $('bPub').textContent='💾 Salvar alterações'; $('bCancel').style.display='';
-    $('fTitulo').value=p.title; $('fSlug').value=slug; $('fSlug').disabled=true; mostrarSlug();
-    $('fResumo').value=p.summary; $('fResumo').dispatchEvent(new Event('input'));
-    if (![].some.call($('fCat').options,function(o){return o.value===p.category;})){ var o=document.createElement('option'); o.textContent=p.category; $('fCat').appendChild(o); }
-    $('fCat').value=p.category; $('fMin').value=p.readTime; $('fMin').dataset.manual='1';
-    editor.innerHTML = limparHtml(txt ? txt.innerHTML : '');
-    $('capaPrev').style.backgroundImage='url('+imgUrl(p)+')'; $('capaPrev').textContent='';
-    aviso('edAviso',''); contarPalavras();
-  }catch(e){ aviso('edAviso', esc(e.message)); }
-}
-
-/* ---------- modelos de página ---------- */
-var WHATS_SVG = '<svg viewBox="0 0 32 32"><path d="M16 3C8.8 3 3 8.7 3 15.8c0 2.5.7 4.9 2 7L3 29l6.4-2c2 1.1 4.3 1.7 6.6 1.7 7.2 0 13-5.7 13-12.8S23.2 3 16 3zm0 23.4c-2.1 0-4.1-.6-5.9-1.7l-.4-.3-3.8 1.2 1.2-3.7-.3-.4c-1.2-1.8-1.8-3.8-1.8-5.9C5 9.8 9.9 5 16 5s11 4.8 11 10.7-4.9 10.7-11 10.7zm6-8c-.3-.2-2-1-2.3-1.1-.3-.1-.5-.2-.8.2-.2.3-.9 1.1-1.1 1.3-.2.2-.4.2-.7.1-.3-.2-1.4-.5-2.7-1.7-1-.9-1.7-2-1.9-2.3-.2-.3 0-.5.1-.7l.5-.6c.2-.2.2-.3.3-.6.1-.2 0-.4 0-.6l-1-2.5c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.3-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.7 5.9 5.1 2.9 1.1 3.5.9 4.1.9.6-.1 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.4-.3-.7-.4z"/></svg>';
-var FONTS = '<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><link rel="stylesheet" href="blog.css"><script src="/js/stats.js" defer><\/script>';
-var HEADER = '<header><div class="wrap nav"><a href="../index.html" class="logo"><span class="star">▶</span>Brasil <span class="grad">UniTV</span></a>\n<nav class="menu"><a href="../index.html">Início</a><a href="index.html">Blog</a><a href="../index.html#planos">Planos</a><a href="../index.html#tvbox">TV Box</a></nav></div></header>';
-var FOOTER = '<footer><div class="wrap">© Brasil UniTV · <a href="../index.html">Voltar ao site</a><br><span style="font-size:11px;opacity:.7">Revendedor independente. UniTV é marca de seu respectivo titular; este site não é o site oficial da marca.</span></div></footer>\n<a class="whats-float" href="https://wa.me/5519996386341?text=Ol%C3%A1%21%20Vim%20pelo%20blog%20da%20Brasil%20UniTV%20e%20quero%20mais%20informa%C3%A7%C3%B5es." target="_blank" rel="noopener" aria-label="WhatsApp">'+WHATS_SVG+'</a>';
-function card(p, h){ return '<a class="card" href="'+esc(p.slug)+'.html"><div class="ph"><img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" loading="lazy" onerror="this.remove()"></div><div class="in"><span class="meta">'+esc(p.category)+' · '+esc(p.readTime)+' min</span><'+h+'>'+esc(p.title)+'</'+h+'><p>'+esc(p.summary)+'</p></div></a>'; }
-function paginaArtigo(p, corpo, lista){
-  var url = cfg.siteUrl+'/blog/'+p.slug+'.html', imgAbs = cfg.siteUrl+'/blog/'+p.image;
-  var ld = JSON.stringify({'@context':'https://schema.org','@type':'Article',headline:p.title,description:p.summary,datePublished:p.date,dateModified:p.updated||p.date,author:{'@type':'Organization',name:'Brasil UniTV'},image:imgAbs,mainEntityOfPage:url}).replace(/</g,'\\u003c');
-  var rel = lista.filter(function(x){return x.slug!==p.slug;}).slice(0,3);
-  return '<!DOCTYPE html>\n<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">\n'+
-    '<title>'+esc(p.title)+' | Brasil UniTV</title><meta name="description" content="'+esc(p.summary)+'"><link rel="canonical" href="'+esc(url)+'">'+
-    '<meta property="og:title" content="'+esc(p.title)+' | Brasil UniTV"><meta property="og:description" content="'+esc(p.summary)+'"><meta property="og:type" content="article"><meta property="og:url" content="'+esc(url)+'"><meta property="og:image" content="'+esc(imgAbs)+'">\n'+
-    FONTS+'<script type="application/ld+json">'+ld+'<\/script></head><body>\n'+HEADER+
-    '<article><a href="index.html" class="voltar">← Voltar para o blog</a><br><br><span class="meta">'+esc(p.category)+' · '+esc(p.readTime)+' min de leitura</span><h1>'+esc(p.title)+'</h1>\n'+
-    '<div class="ph capa"><img src="'+esc(p.image)+'" alt="'+esc(p.title)+'" onerror="this.remove()"></div>\n<div class="txt">\n'+corpo+'\n</div>\n'+
-    '<div class="cta"><h3>Teste grátis hoje mesmo</h3><p>Veja a qualidade na sua TV antes de assinar. Planos a partir de R$ 30,00, sem fidelidade.</p>\n<a class="btn btn-whats" href="https://wa.me/5519996386341?text=Ol%C3%A1%21%20Gostaria%20de%20fazer%20um%20teste%20do%20UniTV" target="_blank" rel="noopener">💬 Quero meu teste grátis</a></div></article>\n'+
-    (rel.length ? '<section class="rel"><h2>Leia também</h2><div class="grid" style="padding:0">'+rel.map(function(x){return card(x,'h3');}).join('')+'</div></section>' : '')+
-    FOOTER+'</body></html>\n';
-}
-function paginaBlog(lista){
-  return '<!DOCTYPE html>\n<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">\n'+
-    '<title>Blog Brasil UniTV — Dicas de TV Box, internet e streaming</title><meta name="description" content="Dicas, guias e comparativos sobre TV Box, Smart TV, internet e streaming para assistir canais, filmes e séries sem travar."><link rel="canonical" href="'+esc(cfg.siteUrl)+'/blog/"><meta property="og:title" content="Blog Brasil UniTV — Dicas de TV Box, internet e streaming"><meta property="og:description" content="Dicas, guias e comparativos sobre TV Box, Smart TV, internet e streaming para assistir canais, filmes e séries sem travar."><meta property="og:type" content="website">\n'+
-    FONTS+'</head><body>\n'+HEADER+'<section class="topo wrap"><span class="meta">Blog</span><h1>Dicas para assistir <span class="grad">melhor</span></h1><p>Guias simples sobre TV Box, internet, Smart TV e planos de streaming.</p></section>\n'+
-    '<div class="wrap grid">'+lista.map(function(p){return card(p,'h2');}).join('')+'</div>'+FOOTER+'</body></html>\n';
-}
-function sitemap(lista){
-  var d = hoje(), u = function(loc,lm){ return '  <url><loc>'+esc(loc)+'</loc><lastmod>'+lm+'</lastmod></url>'; };
-  return '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+
-    [u(cfg.siteUrl+'/',d), u(cfg.siteUrl+'/blog/',d)].concat(lista.map(function(p){return u(cfg.siteUrl+'/blog/'+p.slug+'.html', p.updated||p.date);})).join('\n')+'\n</urlset>\n';
-}
-function arquivosComuns(lista){
-  return [
-    {path:'blog/posts.json', text:JSON.stringify(lista,null,1)+'\n'},
-    {path:'blog/index.html', text:paginaBlog(lista)},
-    {path:'sitemap.xml', text:sitemap(lista)}
-  ];
-}
-
-/* ---------- pré-visualizar / publicar ---------- */
-function montarPost(){
-  var titulo=$('fTitulo').value.trim(), slug=slugify(editSlug||$('fSlug').value||titulo), resumo=$('fResumo').value.trim(), corpo=conteudo();
-  var erros=[];
-  if (titulo.length<10) erros.push('um título (mínimo 10 letras)');
-  if (!slug) erros.push('o endereço');
-  if (resumo.length<40) erros.push('o resumo (mínimo 40 letras)');
-  if (corpo.replace(/<[^>]+>/g,'').trim().length<150) erros.push('o conteúdo (texto muito curto)');
-  if (!imgNova && !imgAtual) erros.push('a imagem de capa');
-  if (!editSlug && posts.some(function(p){return p.slug===slug;})) erros.push('outro endereço (já existe um artigo com esse)');
-  var antigo = editSlug ? posts.find(function(p){return p.slug===editSlug;}) : null;
-  var p = {slug:slug, title:titulo, category:$('fCat').value, readTime:Math.max(1,parseInt($('fMin').value,10)||3), summary:resumo,
-    image: imgNova ? 'img/'+slug+'.'+imgNova.ext : imgAtual, date: antigo ? antigo.date : hoje()};
-  if (antigo) p.updated = hoje();
-  return {p:p, corpo:corpo, erros:erros};
-}
-$('bPrev').onclick = function(){
-  var m = montarPost();
-  var p = Object.assign({}, m.p); if (imgNova) p.image = imgNova.url;
-  var html = paginaArtigo(p, m.corpo, posts).replace('<head>','<head><base href="'+esc(location.origin)+'/blog/">').replace('<script src="/js/stats.js" defer><\/script>','');
-  if (imgNova) html = html.split(esc(cfg.siteUrl+'/blog/'+imgNova.url)).join('');
-  $('mFrame').srcdoc = html; $('modal').classList.add('on');
-};
-$('bCloseM').onclick = function(){ $('modal').classList.remove('on'); $('mFrame').srcdoc=''; };
-
-$('bPub').onclick = async function(){
-  if (!cfg.ghToken){ aviso('edAviso','Para publicar, cole o token do GitHub em <b>Configurações → 1</b> (só uma vez neste aparelho).'); return; }
-  var m = montarPost();
-  if (m.erros.length){ aviso('edAviso','Falta preencher: '+m.erros.join(', ')+'.'); return; }
-  var b = this; b.disabled = true; b.textContent = 'Publicando…';
-  try{
-    var atual = JSON.parse((await ghLer('blog/posts.json')) || '[]');
-    var lista = atual.filter(function(x){return x.slug!==m.p.slug;});
-    lista.unshift(m.p);
-    lista.sort(function(a,c){ return (c.date||'').localeCompare(a.date||''); });
-    var arquivos = [{path:'blog/'+m.p.slug+'.html', text:paginaArtigo(m.p, m.corpo, lista)}].concat(arquivosComuns(lista));
-    if (imgNova){
-      arquivos.push({path:'blog/'+m.p.image, base64:imgNova.base64});
-      if (imgAtual && imgAtual!==m.p.image) arquivos.push({path:'blog/'+imgAtual, del:true});
-    }
-    await ghCommit(arquivos, (editSlug?'Atualiza artigo: ':'Novo artigo: ')+m.p.title);
-    var url = cfg.siteUrl+'/blog/'+m.p.slug+'.html';
-    var eraEdicao = !!editSlug;
-    await carregarPosts();
-    limparEditor();
-    aviso('edAviso','✅ Artigo '+(eraEdicao?'atualizado':'publicado')+'! Em 1 a 2 minutos ele estará no ar: <a href="'+esc(url)+'" target="_blank" rel="noopener">abrir artigo</a> · <a href="'+esc(inspecionar(url))+'" target="_blank" rel="noopener">pedir indexação no Google</a>', true);
-    toast('Publicado com sucesso!','ok');
-  }catch(e){ aviso('edAviso', 'Não foi possível publicar: '+esc(e.message)); }
-  b.disabled = false; b.textContent = editSlug ? '💾 Salvar alterações' : '🚀 Publicar artigo';
-};
-
-async function excluir(slug, btn){
-  if (!cfg.ghToken){ toast('Para excluir, salve o token do GitHub em Configurações.','err'); ir('config'); return; }
-  var p = posts.find(function(x){return x.slug===slug;});
-  if (!p || !confirm('Excluir o artigo “'+p.title+'”?\n\nEle sai do site e do blog. Ainda dá para recuperar pelo histórico do GitHub.')) return;
-  btn.disabled = true; btn.textContent='Excluindo…';
-  try{
-    var atual = JSON.parse((await ghLer('blog/posts.json')) || '[]');
-    var lista = atual.filter(function(x){return x.slug!==slug;});
-    var arquivos = [{path:'blog/'+slug+'.html', del:true}].concat(arquivosComuns(lista));
-    if (p.image && !lista.some(function(x){return x.image===p.image;})) arquivos.push({path:'blog/'+p.image, del:true});
-    await ghCommit(arquivos, 'Remove artigo: '+p.title);
-    toast('Artigo excluído.','ok');
-    await carregarPosts();
-  }catch(e){ toast(e.message,'err'); btn.disabled=false; btn.textContent='Excluir'; }
-}
-
-/* ---------- início ---------- */
-function abrir(){
-  $('login').style.display='none'; $('app').style.display='block';
-  loadCfg(); fillCfg();
-  carregarPosts().then(carregarVisitas);
-}
-if (sessionStorage.getItem('unitv_admin')==='1') abrir();
-})();
 </script>
 </body>
 </html>

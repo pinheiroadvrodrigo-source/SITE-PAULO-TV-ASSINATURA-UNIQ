@@ -534,5 +534,18 @@ document.getElementById("botFechar").onclick=()=>bot.classList.remove("aberto");
 document.getElementById("botForm").onsubmit=e=>{e.preventDefault();const i=document.getElementById("botTxt");if(i.value.trim()){pergunta(i.value.trim());i.value="";}};
 
 </script>
+<script>
+document.addEventListener('DOMContentLoaded',async function(){
+  var S=window.SUPA; if(!S||!S.ok) return;
+  try{
+    var r=await fetch(S.url+'/rest/v1/artigos?select=slug,titulo,resumo,categoria,imagem,tempo_leitura&publicado=eq.true&order=criado_em.desc&limit=3',{headers:{apikey:S.key,Authorization:'Bearer '+S.key}});
+    var L=await r.json(); if(!Array.isArray(L)||!L.length) return;
+    var g=document.querySelector('.blog-grid'); if(!g) return;
+    var esc=function(t){var d=document.createElement('div');d.textContent=t||'';return d.innerHTML};
+    g.insertAdjacentHTML('afterbegin',L.map(function(a){return '<a class="card" href="blog/artigo.html?a='+encodeURIComponent(a.slug)+'"><div class="ph">'+(a.imagem?'<img src="'+esc(a.imagem)+'" alt="'+esc(a.titulo)+'" loading="lazy">':'')+'</div><div class="in"><span class="meta">'+esc(a.categoria)+' · '+(a.tempo_leitura||4)+' min</span><h3>'+esc(a.titulo)+'</h3><p>'+esc(a.resumo)+'</p></div></a>'}).join(''));
+    while(g.children.length>3) g.lastElementChild.remove();
+  }catch(e){}
+});
+</script>
 </body>
 </html>
